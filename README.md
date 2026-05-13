@@ -1,66 +1,33 @@
-## Foundry
+## ROColor
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+**ROColor is a NFT collection of all 16.7M+ web colors, formed as native-onchain assets for pure Web3 artistry.**
 
-Foundry consists of:
+This repository is a refresh of the backend (contract) & frontend (webpage) components of my RockoperaColor project, focusing on **better quality** and **better security**.
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Long Term Goal
 
-## Documentation
+To craft a higher quality native-onchain art primitive as a basis for future primitives, each composable in a native-onchain art studio, unlocking more & greater forms of artistry. This is inspired by how traditional finance has been unlocked through the blockchain capabilities of DeFi.
 
-https://book.getfoundry.sh/
+## Short Term Goal
 
-## Usage
+To show that I am a technical program manager, by building with the computer science skills & principles acquired through formal education undertaken in the first half of 2026. And, I mean, making money off of this would also be, like, really neat... I did with the currently live version, so I know it's totally possible!
 
-### Build
+## Plan
 
-```shell
-$ forge build
-```
+Rebuild two repositories (xyz and abc) into this one, tracked via the following...
 
-### Test
+### Backlog
 
-```shell
-$ forge test
-```
+- review notes for backlog items
+- high quality code outline
+- high quality NatSpec
+- high quality 1 function
+- high quality unit testing for this 1 function
+- TBD
 
-### Format
+## Donations
 
-```shell
-$ forge fmt
-```
+If you're intrigued or inspired by my Web3 explorations in artistry, I accept ETH via:
+**rockopera.eth** / 0xa5bdBF3081A3c6a9740B33f2bdD3295C3fc15835
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Rock on, every peoples!
