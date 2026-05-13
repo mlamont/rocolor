@@ -10,7 +10,7 @@ To craft a higher quality native-onchain art primitive as a basis for future pri
 
 ## Short Term Goal
 
-To show that I am a technical program manager by building with the computer science skills & principles acquired through formal education undertaken in the first half of 2026. And, I mean, making money off of this would also be, like, really neat... I did with the currently live version, so I know it's totally possible!
+To show that I am a technical project manager by building with the computer science skills & principles acquired through formal education undertaken in the first half of 2026. And, I mean, making money off of this would also be, like, really neat... I did with the currently live version, so I know it's totally possible!
 
 ## Plan
 
