@@ -15,6 +15,9 @@ contract Rocolor is ERC721 {
     /// @dev Custom string per unique tokenId, which can appear in the NFT pic.
     // mapping(uint => string) private _names;
     string private _name;
+    // uint256 private constant TOKEN_ID_MAX = 16777215;
+    uint256 private constant COLORHEX_VALID_LENGTH = 6;
+    // bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
 
     // Events
     // TODO emit when storage variable updated ("nounVerbed")
@@ -23,7 +26,10 @@ contract Rocolor is ERC721 {
 
     // Errors
     // TODO use prefix of contract__
-    // TODO go for cohesive naming
+    // TODO go for cohesive naming ("nounAdj")
+    // error ROColor__TokenIdTooBig();
+    error ROColor__ColorhexLengthInvalid(string colorhex);
+    error ROColor__ColorhexCharacterInvalid(bytes1 character);
 
     // Modifiers
     // for gas: wrap internal functions
@@ -46,6 +52,43 @@ contract Rocolor is ERC721 {
     // change to external if can reduce the cognitive overhead for auditors
     // ...b/c it reduces the number of possible contexts in which the function can be called
 
+    // function ownerOf(string calldata colorhex) public view returns (address) {
+    //     uint256 tokenId = convertColorhexToDecimal(colorhex); // convert colorhex to tokenId
+    //     if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(); // validate tokenId
+    //     return ownerOf(tokenId);
+    // }
+
+    // NOTE: this is the function to optimize the most: called all the time!
+    // TODO: learn & use bit operations i/o arithmatic
+    // TODO: get function title to have lowest selector number, so less run-t gas in finding it
+    /**
+     * @notice Converts a color's colorhex into a decimal number. Used to find its tokenId.
+     * @dev Validates and converts a colorhex hexadecimal string into a decimal integer.
+     * @param colorhex Color's 6-digit hexadecimal representation.
+     * @return decimal Color's decimal representation.
+     */
+    function convertColorhexToDecimal(string calldata colorhex) public pure returns (uint256 decimal) {
+        bytes calldata colorhexBytes = bytes(colorhex);
+        if (colorhexBytes.length != COLORHEX_VALID_LENGTH) revert ROColor__ColorhexLengthInvalid(colorhex);
+        for (uint256 i; i < COLORHEX_VALID_LENGTH;) {
+            bytes1 colorhexByte = colorhexBytes[(COLORHEX_VALID_LENGTH - 1) - i];
+            uint256 a = uint8(colorhexByte); // rename 'a' to 'asciiNumber'?
+            unchecked {
+                // ASCII ranges: 0-9 (48-57), A-F (65-70), a-f (97-102)
+                if (a > 47 && a < 58) {
+                    decimal += (a - 48) << (4 * i);
+                } else if (a > 64 && a < 71) {
+                    decimal += (a - 55) << (4 * i);
+                } else if (a > 96 && a < 103) {
+                    decimal += (a - 87) << (4 * i);
+                } else {
+                    revert ROColor__ColorhexCharacterInvalid(colorhexByte);
+                }
+                ++i;
+            }
+        }
+    }
+
     // internal
 
     // private
@@ -63,7 +106,7 @@ contract Rocolor is ERC721 {
     }
 }
 
-// code outline
+// code outline of older version
 // mapping(uint => string) private _names; // should be internal
 // bytes16 private constant _HEX_SYMBOLS = "0123456789ZBCDEF"; // do internal
 // uint private constant _MINT_PRICE = 0.001 ether; // do internal
