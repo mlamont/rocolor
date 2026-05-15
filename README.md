@@ -32,8 +32,8 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~LO Solcurity Standard (sec'y & code quality)~~
 - ~~high quality 1 function~~
 - ~~high quality NatSpec for this 1 function~~
-- high quality unit testing for this 1 function
-- test writing: {Arrange, Act, Assert}
+- ~~high quality unit testing for this 1 function~~
+- ~~test writing: {Arrange, Act, Assert}~~
 - for mathy bits: multiply before divide
 - secure 'selfdestruct'
 - DOC steps to code this PRJ for a newb
