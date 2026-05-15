@@ -19,19 +19,17 @@ Rebuild two repositories into this one, tracked via the following...
 ### Backlog
 
 - ~~review notes for backlog items, and loosely prioritize~~
-- install dep'cies before import
-- LO NacentXYZ's DOCs RE sec'y
-- LO Solcurity Standard (sec'y & code quality)
-- modifier should be a wrapped internal function (for gas)
-- external functions += nonReentrant modifier
-- use Solidity Style Guide's Layouts of a Contract & Functions
-- update storage variable, then emit an event ("nounVerb'd")
-- know the format'g scheme
-- INV EOF d'older PRJs 4 NTS
-- think about optics 4 constants & immutables & state variables ... & capitalizing
-- custom errors & events: "contract\_\_" prefix, cohesive haming, do after state changes
-- use modifiers to improve readability & decrease code duplication
-- use label'd imports
+- ~~use Solidity Style Guide's Layouts of a Contract & Functions~~
+- ~~install dep'cies before import~~
+- ~~modifier should be a wrapped internal function (for gas)~~
+- ~~external functions += nonReentrant modifier~~
+- ~~update storage variable, then emit an event ("nounVerb'd")~~
+- ~~think about options 4 constants & immutables & state variables ... & capitalizing~~
+- ~~custom errors & events: "contract\_\_" prefix, cohesive naming, do after state changes~~
+- ~~use modifiers to improve readability & decrease code duplication~~
+- ~~use label'd imports~~
+- ~~LO NacentXYZ's DOCs RE sec'y~~
+- ~~LO Solcurity Standard (sec'y & code quality)~~
 - high quality code outline
 - high quality NatSpec
 - high quality 1 function
@@ -55,6 +53,10 @@ Rebuild two repositories into this one, tracked via the following...
 - get auto-gen'g DOCs site
 - set habit of reading rekt & audit reports
 - test order: unit tests, test cov'ge, fuzz, static
+- aim: readability ... in turn, improved maintainability
+- Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
+- Comment the "why" as much as possible.
+- Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.
 
 ## Donations
 
