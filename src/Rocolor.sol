@@ -4,8 +4,9 @@ pragma solidity 0.8.33;
 
 // TODO install depedencies before import
 // TODO use labeled imports
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract Rocolor {
+contract Rocolor is ERC721 {
     // State variables
     // think about options 4 constants & immutables & state variables, & capital'z'g
     // Only use private to intentionally prevent child contracts from
@@ -30,7 +31,7 @@ contract Rocolor {
     // yes, use natspec
 
     // constructor
-    constructor() {
+    constructor() ERC721("ROColor", "ROC") {
         // starting stuff
     }
 
@@ -66,21 +67,15 @@ contract Rocolor {
 // mapping(uint => string) private _names; // should be internal
 // bytes16 private constant _HEX_SYMBOLS = "0123456789ZBCDEF"; // do internal
 // uint private constant _MINT_PRICE = 0.001 ether; // do internal
-// setToken(colorhex, name)
-// _setToken(tokenId, name)
+// setToken(colorhex, name) -     _setToken(tokenId, name)
 // withdraw()
 // receive()
 // fallback()
-// nixToken(colorhex)
-// _nixToken(tokenId)
-// getOwner(colorhex)
-// _getOwner(tokenId)
-// modOwner(colorhex, newOwner)
-// _modOwner(tokenId, newOwner)
-// getName(colorhex)
-// _getName(tokenId)
-// modName(colorhex, newName)
-// _modName(tokenId, newName)
+// nixToken(colorhex) -           _nixToken(tokenId)
+// getOwner(colorhex) -           _getOwner(tokenId)
+// modOwner(colorhex, newOwner) - _modOwner(tokenId, newOwner)
+// getName(colorhex) -            _getName(tokenId)
+// modName(colorhex, newName) -   _modName(tokenId, newName)
 // modifier: onlyTokenOwner(tokenId)
 // aGetId(colorhex)
 // getColorhex(n)
