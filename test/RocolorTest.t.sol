@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.33;
 
-import {Test} from "lib/forge-std/src/Test.sol";
+import {Test, console} from "lib/forge-std/src/Test.sol";
 import {Rocolor} from "src/Rocolor.sol";
 import {DeployRocolor} from "script/DeployRocolor.s.sol";
 
@@ -58,21 +58,25 @@ contract RocolorTest is Test, Rocolor {
         colorhex = "";
         vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
         decimal = rocolor.convertColorhexToDecimal(colorhex);
+        console.log("reverted length == 0");
 
         // case: length == 1
         colorhex = "a";
         vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
         decimal = rocolor.convertColorhexToDecimal(colorhex);
+        console.log("reverted length == 1");
 
         // case: length == 5
         colorhex = "a1b2c";
         vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
         decimal = rocolor.convertColorhexToDecimal(colorhex);
+        console.log("reverted length == 5");
 
         // case: length == 7
         colorhex = "a1b2c3d";
         vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
         decimal = rocolor.convertColorhexToDecimal(colorhex);
+        console.log("reverted length == 7");
     }
 
     function testConvertColorhexToDecimal_Characters() public {
@@ -100,6 +104,7 @@ contract RocolorTest is Test, Rocolor {
         colorhex = "a1b c3";
         vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
         decimal = rocolor.convertColorhexToDecimal(colorhex);
+        console.log("reverted bad character is [space]");
 
         // case: bad character is ;
         colorhex = "a1b;c3";
@@ -112,21 +117,25 @@ contract RocolorTest is Test, Rocolor {
         decimal = MURPH_LIGHT_DECIMAL;
         colorhex = rocolor.convertDecimalToColorhex(decimal);
         assertEq(colorhex, MURPH_LIGHT_COLORHEX);
+        console.log("accepted happy path");
 
         // case: smallest
         decimal = BLACK_DECIMAL;
         colorhex = rocolor.convertDecimalToColorhex(decimal);
         assertEq(colorhex, "000000");
-
-        // case: biggest
-        decimal = WHITE_DECIMAL;
-        colorhex = rocolor.convertDecimalToColorhex(decimal);
-        assertEq(colorhex, "FFFFFF");
+        console.log("accepted smallest");
 
         // case: too big
         decimal = WHITE_DECIMAL + 1;
         vm.expectPartialRevert(ROColor__DecimalTooBig.selector);
         colorhex = rocolor.convertDecimalToColorhex(decimal);
+        console.log("reverted too big");
+
+        // case: biggest
+        decimal = WHITE_DECIMAL;
+        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        assertEq(colorhex, "FFFFFF");
+        console.log("accepted largest");
     }
 }
 
