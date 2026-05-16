@@ -17,7 +17,8 @@ contract Rocolor is ERC721 {
     string private _name;
     // uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant COLORHEX_VALID_LENGTH = 6;
-    // bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
+    bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
+    uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
 
     // Events
     // TODO emit when storage variable updated ("nounVerbed")
@@ -30,6 +31,7 @@ contract Rocolor is ERC721 {
     // error ROColor__TokenIdTooBig();
     error ROColor__ColorhexLengthInvalid(string colorhex);
     error ROColor__ColorhexCharacterInvalid(bytes1 character);
+    error ROColor__DecimalTooBig(uint256 decimal);
 
     // Modifiers
     // for gas: wrap internal functions
@@ -59,6 +61,7 @@ contract Rocolor is ERC721 {
     // }
 
     // NOTE: this is the function to optimize the most: called all the time!
+    // TODO: document, like a pro, the logic of this function (what's before vs what's inline)
     // TODO: learn & use bit operations i/o arithmatic
     // TODO: get function title to have lowest selector number, so less run-t gas in finding it
     /**
@@ -76,17 +79,37 @@ contract Rocolor is ERC721 {
             unchecked {
                 // ASCII ranges: 0-9 (48-57), A-F (65-70), a-f (97-102)
                 if (a > 47 && a < 58) {
-                    decimal += (a - 48) << (4 * i);
+                    decimal += (a - 48) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
                 } else if (a > 64 && a < 71) {
-                    decimal += (a - 55) << (4 * i);
+                    decimal += (a - 55) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
                 } else if (a > 96 && a < 103) {
-                    decimal += (a - 87) << (4 * i);
+                    decimal += (a - 87) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
                 } else {
                     revert ROColor__ColorhexCharacterInvalid(colorhexByte);
                 }
                 ++i;
             }
         }
+    }
+
+    // TODO: document, like a pro, the logic of this function (what's before vs what's inline)
+    /**
+     * @notice Converts a token's tokenId into its colorhex: the color's 6-digit hexadecimal code.
+     * @dev Validates and converts a tokenId decimal integer into a hexadecimal string: the colorhex.
+     * @param decimal Color's tokenId.
+     * @return colorhex Color's 6-digit hexadecimal representation.
+     */
+    function convertDecimalToColorhex(uint256 decimal) public pure returns (string memory colorhex) {
+        if (decimal > 16777215) revert ROColor__DecimalTooBig(decimal);
+        bytes memory colorhexBytes = new bytes(COLORHEX_VALID_LENGTH);
+        for (uint256 i = 1; i < (COLORHEX_VALID_LENGTH + 1);) {
+            colorhexBytes[COLORHEX_VALID_LENGTH - i] = HEX_SYMBOLS[decimal & 0xF];
+            decimal >>= NUMBER_OF_BITS_IN_A_HEXADECIMAL;
+            unchecked {
+                ++i;
+            }
+        }
+        colorhex = string(colorhexBytes);
     }
 
     // internal

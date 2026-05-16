@@ -11,9 +11,10 @@ contract RocolorTest is Test, Rocolor {
     DeployRocolor deployer;
     string colorhex;
     uint256 decimal;
-    uint256 constant MURPH_LIGHT = 12695456;
-    uint256 constant WHITE = 16777215;
-    uint256 constant BLACK = 0;
+    uint256 constant MURPH_LIGHT_DECIMAL = 12695456;
+    string constant MURPH_LIGHT_COLORHEX = "C1B7A0";
+    uint256 constant WHITE_DECIMAL = 16777215;
+    uint256 constant BLACK_DECIMAL = 0;
 
     function setUp() public {
         deployer = new DeployRocolor();
@@ -27,29 +28,29 @@ contract RocolorTest is Test, Rocolor {
         // Act
         decimal = rocolor.convertColorhexToDecimal(colorhex);
         // Assert
-        assertEq(decimal, MURPH_LIGHT);
+        assertEq(decimal, MURPH_LIGHT_DECIMAL);
 
         // case: all lowercase
         colorhex = "c1b7a0";
         decimal = rocolor.convertColorhexToDecimal(colorhex);
-        assertEq(decimal, MURPH_LIGHT);
+        assertEq(decimal, MURPH_LIGHT_DECIMAL);
 
         // case: mixed case
         colorhex = "C1b7A0";
         decimal = rocolor.convertColorhexToDecimal(colorhex);
-        assertEq(decimal, MURPH_LIGHT);
+        assertEq(decimal, MURPH_LIGHT_DECIMAL);
     }
 
     function testConvertColorhexToDecimal_Bounds() public {
         // case: lowest
         colorhex = "000000";
         decimal = rocolor.convertColorhexToDecimal(colorhex);
-        assertEq(decimal, BLACK);
+        assertEq(decimal, BLACK_DECIMAL);
 
         // case: highest
         colorhex = "FFFFFF";
         decimal = rocolor.convertColorhexToDecimal(colorhex);
-        assertEq(decimal, WHITE);
+        assertEq(decimal, WHITE_DECIMAL);
     }
 
     function testConvertColorhexToDecimal_Length() public {
@@ -104,6 +105,28 @@ contract RocolorTest is Test, Rocolor {
         colorhex = "a1b;c3";
         vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
         decimal = rocolor.convertColorhexToDecimal(colorhex);
+    }
+
+    function testConvertDecimalToColorhex() public {
+        // case: a happy path
+        decimal = MURPH_LIGHT_DECIMAL;
+        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        assertEq(colorhex, MURPH_LIGHT_COLORHEX);
+
+        // case: smallest
+        decimal = BLACK_DECIMAL;
+        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        assertEq(colorhex, "000000");
+
+        // case: biggest
+        decimal = WHITE_DECIMAL;
+        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        assertEq(colorhex, "FFFFFF");
+
+        // case: too big
+        decimal = WHITE_DECIMAL + 1;
+        vm.expectPartialRevert(ROColor__DecimalTooBig.selector);
+        colorhex = rocolor.convertDecimalToColorhex(decimal);
     }
 }
 
