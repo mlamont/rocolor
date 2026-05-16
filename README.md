@@ -34,17 +34,18 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~high quality NatSpec for this 1 function~~
 - ~~high quality unit testing for this 1 function~~
 - ~~test writing: {Arrange, Act, Assert}~~
+- ~~test += console.log~~
+- create a script for deploy'g... can then use for testing
+- write unit tests, then code, for converting decimal to colorhex
+- only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
 - for mathy bits: multiply before divide
 - secure 'selfdestruct'
 - DOC steps to code this PRJ for a newb
-- create a script for deploy'g... can then use for testing
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
 - set & use Helper.Config.s.sol for NetworkConfig for deploy script
 - test functions += modifiers (to modularize)
 - maybe use a MAKE file
 - CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
-- test-writing approach: write deploy script, write test (local, testnet)
-- test += console.log
 - cannot compare strings, so compare (bytes32) hashed encoded ones
 - FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - do static analysis eg Slither / Mythril
@@ -55,7 +56,6 @@ Rebuild two repositories into this one, tracked via the following...
 - Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
 - Comment the "why" as much as possible.
 - Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.
-- only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
 
 ## Donations
 
