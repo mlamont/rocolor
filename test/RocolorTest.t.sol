@@ -4,9 +4,11 @@ pragma solidity 0.8.33;
 
 import {Test} from "lib/forge-std/src/Test.sol";
 import {Rocolor} from "src/Rocolor.sol";
+import {DeployRocolor} from "script/DeployRocolor.s.sol";
 
 contract RocolorTest is Test, Rocolor {
     Rocolor rocolor;
+    DeployRocolor deployer;
     string colorhex;
     uint256 decimal;
     uint256 constant MURPH_LIGHT = 12695456;
@@ -14,7 +16,8 @@ contract RocolorTest is Test, Rocolor {
     uint256 constant BLACK = 0;
 
     function setUp() public {
-        rocolor = new Rocolor();
+        deployer = new DeployRocolor();
+        rocolor = deployer.run();
     }
 
     function testConvertColorhexToDecimal_Capitalizations() public {

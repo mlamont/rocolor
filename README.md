@@ -35,7 +35,7 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~high quality unit testing for this 1 function~~
 - ~~test writing: {Arrange, Act, Assert}~~
 - ~~test += console.log~~
-- create a script for deploy'g... can then use for testing
+- ~~create a script for deploy'g... can then use for testing~~
 - write unit tests, then code, for converting decimal to colorhex
 - only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
 - for mathy bits: multiply before divide
