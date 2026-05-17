@@ -57,6 +57,9 @@ Rebuild two repositories into this one, tracked via the following...
 - Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
 - Comment the "why" as much as possible.
 - Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.
+- note: DoD: high quality
+- front end on blog's server, later on an IPFS node hosted on that server, if possible
+- explore this being a proxy contract, or utilizing a library / interface / abstract contract
 
 ## Donations
 
