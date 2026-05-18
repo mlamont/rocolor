@@ -38,8 +38,8 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~create a script for deploy'g... can then use for testing~~
 - ~~write unit tests, then code, for converting decimal to colorhex~~
 - ~~document the logic of the 2 conversion functions like a pro: what comments are before vs inline~~
+- ~~name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param~~
 - only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
-- name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'colorhex' param
 - for mathy bits: multiply before divide
 - secure 'selfdestruct'
 - DOC steps to code this PRJ for a newb

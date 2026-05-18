@@ -13,10 +13,10 @@ contract Rocolor is ERC721 {
     // ...accessing the variable, prefer internal for flexibility.
     // Is calculating a value on the fly cheaper than storing it?
     /// @dev Custom string per unique tokenId, which can appear in the NFT pic.
-    // mapping(uint => string) private _names;
-    string private _name;
-    // uint256 private constant TOKEN_ID_MAX = 16777215;
-    uint256 private constant COLORHEX_VALID_LENGTH = 6;
+    mapping(uint256 tokenId => string) internal _colorNames; // include "tokenId"? internal i/o private?
+    string private _name; // gotta get rid of this one... already exists in ERC721
+    uint256 private constant TOKEN_ID_MAX = 16777215;
+    uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
     uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
 
@@ -29,8 +29,8 @@ contract Rocolor is ERC721 {
     // TODO use prefix of contract__
     // TODO go for cohesive naming ("nounAdj")
     // error ROColor__TokenIdTooBig();
-    error ROColor__ColorhexLengthInvalid(string colorhex);
-    error ROColor__ColorhexCharacterInvalid(bytes1 character);
+    error ROColor__HexTripletLengthInvalid(string hexTriplet);
+    error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
     error ROColor__DecimalTooBig(uint256 decimal);
 
     // Modifiers
@@ -68,15 +68,15 @@ contract Rocolor is ERC721 {
      * @dev Constructs decimal number as the sum of the appropriately bit-shifted bit-values of each hexadecimal numeral
      * @dev Reverts if input is not exactly 6 bytes
      * @dev Reverts if an input byte is not a hexadecimal numeral
-     * @param colorhex A hexadecimal number, likely a web color hex triplet
+     * @param hexTriplet A hexadecimal number, likely a web color hex triplet
      * @return decimal A decimal number, likely a ROColor's tokenId
      */
-    function convertColorhexToDecimal(string calldata colorhex) public pure returns (uint256 decimal) {
-        bytes calldata colorhexBytes = bytes(colorhex);
-        if (colorhexBytes.length != COLORHEX_VALID_LENGTH) revert ROColor__ColorhexLengthInvalid(colorhex);
-        for (uint256 i; i < COLORHEX_VALID_LENGTH;) {
-            bytes1 colorhexByte = colorhexBytes[(COLORHEX_VALID_LENGTH - 1) - i];
-            uint256 a = uint8(colorhexByte); // rename 'a' to 'asciiNumber'? also, the casts seem awkward
+    function convertHexTripletToDecimal(string calldata hexTriplet) public pure returns (uint256 decimal) {
+        bytes calldata hexTripletBytes = bytes(hexTriplet);
+        if (hexTripletBytes.length != HEX_TRIPLET_VALID_LENGTH) revert ROColor__HexTripletLengthInvalid(hexTriplet);
+        for (uint256 i; i < HEX_TRIPLET_VALID_LENGTH;) {
+            bytes1 hexTripletByte = hexTripletBytes[(HEX_TRIPLET_VALID_LENGTH - 1) - i];
+            uint256 a = uint8(hexTripletByte); // rename 'a' to 'asciiNumber'? also, the casts seem awkward
             unchecked {
                 // ASCII ranges: 0-9 (48-57), A-F (65-70), a-f (97-102)
                 if (a > 47 && a < 58) {
@@ -86,7 +86,7 @@ contract Rocolor is ERC721 {
                 } else if (a > 96 && a < 103) {
                     decimal += (a - 87) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
                 } else {
-                    revert ROColor__ColorhexCharacterInvalid(colorhexByte);
+                    revert ROColor__HexTripletNumeralInvalid(hexTripletByte);
                 }
                 ++i;
             }
@@ -98,19 +98,19 @@ contract Rocolor is ERC721 {
      * @dev Constructs hex triplet's bytes, right-to-left, with decimal's mod-16 value, then right-bit-shifting the decimal by 1 byte
      * @dev Reverts if input is 2^24 or greater
      * @param decimal A positive decimal integer, likely a ROColor's tokenId
-     * @return colorhex A hexadecimal number, likely a web color hex triplet
+     * @return hexTriplet A hexadecimal number, likely a web color hex triplet
      */
-    function convertDecimalToColorhex(uint256 decimal) public pure returns (string memory colorhex) {
-        if (decimal > 16777215) revert ROColor__DecimalTooBig(decimal);
-        bytes memory colorhexBytes = new bytes(COLORHEX_VALID_LENGTH);
-        for (uint256 i = 1; i < (COLORHEX_VALID_LENGTH + 1);) {
-            colorhexBytes[COLORHEX_VALID_LENGTH - i] = HEX_SYMBOLS[decimal & 0xF];
+    function convertDecimalToHexTriplet(uint256 decimal) public pure returns (string memory hexTriplet) {
+        if (decimal > TOKEN_ID_MAX) revert ROColor__DecimalTooBig(decimal);
+        bytes memory hexTripletBytes = new bytes(HEX_TRIPLET_VALID_LENGTH);
+        for (uint256 i = 1; i < (HEX_TRIPLET_VALID_LENGTH + 1);) {
+            hexTripletBytes[HEX_TRIPLET_VALID_LENGTH - i] = HEX_SYMBOLS[decimal & 0xF];
             decimal >>= NUMBER_OF_BITS_IN_A_HEXADECIMAL;
             unchecked {
                 ++i;
             }
         }
-        colorhex = string(colorhexBytes);
+        hexTriplet = string(hexTripletBytes);
     }
 
     // internal
@@ -130,14 +130,30 @@ contract Rocolor is ERC721 {
     }
 }
 
+// code outline of newer version
+// only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
+// name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param
+// ...
+/* mapping(uint256 => string) internal _colorNames; */
+// modifier: onlyColorOwner(tokenId)             _onlyColorOwner(tokenId)
+// receive()
+// fallback()
+// withdraw()
+// mintColor(hexTriplet, colorName)              _mintColor(tokenId, colorName)
+// burnColor(hexTriplet)                         _burnColor(tokenId)
+// getColorOwner(hexTriplet)                     _getColorOwner(tokenId)
+// changeColorOwner(hexTriplet, newColorOwner)   _changeColorOwner(tokenId, newColorOwner)
+// getColorName(hexTriplet)                      _getColorName(tokenId)
+// changeColorName(hexTriplet, newColorName)     _changeColorName(tokenId, newColorName)
+/* convertDecimalToHexTriplet(decimal) */
+/* convertHexTripletToDecimal(hexTriplet) */
+// tokenURI()
+
 // code outline of older version
 // mapping(uint => string) private _names; // should be internal
 // bytes16 private constant _HEX_SYMBOLS = "0123456789ZBCDEF"; // do internal
 // uint private constant _MINT_PRICE = 0.001 ether; // do internal
 // setToken(colorhex, name) -     _setToken(tokenId, name)
-// withdraw()
-// receive()
-// fallback()
 // nixToken(colorhex) -           _nixToken(tokenId)
 // getOwner(colorhex) -           _getOwner(tokenId)
 // modOwner(colorhex, newOwner) - _modOwner(tokenId, newOwner)
