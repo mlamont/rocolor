@@ -61,21 +61,22 @@ contract Rocolor is ERC721 {
     // }
 
     // NOTE: this is the function to optimize the most: called all the time!
-    // TODO: document, like a pro, the logic of this function (what's before vs what's inline)
     // TODO: learn & use bit operations i/o arithmatic
     // TODO: get function title to have lowest selector number, so less run-t gas in finding it
     /**
-     * @notice Converts a color's colorhex into a decimal number. Used to find its tokenId.
-     * @dev Validates and converts a colorhex hexadecimal string into a decimal integer.
-     * @param colorhex Color's 6-digit hexadecimal representation.
-     * @return decimal Color's decimal representation.
+     * @notice Converts a hexadecimal number into its decimal representation
+     * @dev Constructs decimal number as the sum of the appropriately bit-shifted bit-values of each hexadecimal numeral
+     * @dev Reverts if input is not exactly 6 bytes
+     * @dev Reverts if an input byte is not a hexadecimal numeral
+     * @param colorhex A hexadecimal number, likely a web color hex triplet
+     * @return decimal A decimal number, likely a ROColor's tokenId
      */
     function convertColorhexToDecimal(string calldata colorhex) public pure returns (uint256 decimal) {
         bytes calldata colorhexBytes = bytes(colorhex);
         if (colorhexBytes.length != COLORHEX_VALID_LENGTH) revert ROColor__ColorhexLengthInvalid(colorhex);
         for (uint256 i; i < COLORHEX_VALID_LENGTH;) {
             bytes1 colorhexByte = colorhexBytes[(COLORHEX_VALID_LENGTH - 1) - i];
-            uint256 a = uint8(colorhexByte); // rename 'a' to 'asciiNumber'?
+            uint256 a = uint8(colorhexByte); // rename 'a' to 'asciiNumber'? also, the casts seem awkward
             unchecked {
                 // ASCII ranges: 0-9 (48-57), A-F (65-70), a-f (97-102)
                 if (a > 47 && a < 58) {
@@ -92,12 +93,12 @@ contract Rocolor is ERC721 {
         }
     }
 
-    // TODO: document, like a pro, the logic of this function (what's before vs what's inline)
     /**
-     * @notice Converts a token's tokenId into its colorhex: the color's 6-digit hexadecimal code.
-     * @dev Validates and converts a tokenId decimal integer into a hexadecimal string: the colorhex.
-     * @param decimal Color's tokenId.
-     * @return colorhex Color's 6-digit hexadecimal representation.
+     * @notice Converts a decimal number into its hexadecimal representation
+     * @dev Constructs hex triplet's bytes, right-to-left, with decimal's mod-16 value, then right-bit-shifting the decimal by 1 byte
+     * @dev Reverts if input is 2^24 or greater
+     * @param decimal A positive decimal integer, likely a ROColor's tokenId
+     * @return colorhex A hexadecimal number, likely a web color hex triplet
      */
     function convertDecimalToColorhex(uint256 decimal) public pure returns (string memory colorhex) {
         if (decimal > 16777215) revert ROColor__DecimalTooBig(decimal);
@@ -146,3 +147,12 @@ contract Rocolor is ERC721 {
 // aGetId(colorhex)
 // getColorhex(n)
 // tokenURI()
+
+// commenting pre-function, start w/ natspec:
+// @notice explains to a user starting w/ present tense verb
+// @dev explains to a developer, incl. requirements, important, warning, "emits an XYZ event", "reverts if..."
+// @param
+// @return
+//
+// commenting mid-function:
+// notable subtitles within an important f'n
