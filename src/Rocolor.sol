@@ -6,6 +6,7 @@ pragma solidity 0.8.33;
 // TODO use labeled imports
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract Rocolor is ERC721, Ownable {
     // State variables
@@ -180,6 +181,8 @@ contract Rocolor is ERC721, Ownable {
         }
         hexTriplet = string(hexTripletBytes);
     }
+
+    // tokenId() will go here
 
     // internal
     function _mintColor(uint256 tokenId, string memory colorName) internal {
