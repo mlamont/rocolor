@@ -21,119 +21,119 @@ contract RocolorTest is Test, Rocolor {
         rocolor = deployer.run();
     }
 
-    function testConvertColorhexToDecimal_Capitalizations() public {
+    function testConvertHexTripletToDecimal_Capitalizations() public {
         // case: all caps
         // Arrange
         colorhex = "C1B7A0";
         // Act
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         // Assert
         assertEq(decimal, MURPH_LIGHT_DECIMAL);
 
         // case: all lowercase
         colorhex = "c1b7a0";
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         assertEq(decimal, MURPH_LIGHT_DECIMAL);
 
         // case: mixed case
         colorhex = "C1b7A0";
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         assertEq(decimal, MURPH_LIGHT_DECIMAL);
     }
 
-    function testConvertColorhexToDecimal_Bounds() public {
+    function testConvertHexTripletToDecimal_Bounds() public {
         // case: lowest
         colorhex = "000000";
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         assertEq(decimal, BLACK_DECIMAL);
 
         // case: highest
         colorhex = "FFFFFF";
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         assertEq(decimal, WHITE_DECIMAL);
     }
 
-    function testConvertColorhexToDecimal_Length() public {
+    function testConvertHexTripletToDecimal_Length() public {
         // case: length == 0
         colorhex = "";
-        vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         console.log("reverted length == 0");
 
         // case: length == 1
         colorhex = "a";
-        vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         console.log("reverted length == 1");
 
         // case: length == 5
         colorhex = "a1b2c";
-        vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         console.log("reverted length == 5");
 
         // case: length == 7
         colorhex = "a1b2c3d";
-        vm.expectPartialRevert(ROColor__ColorhexLengthInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         console.log("reverted length == 7");
     }
 
-    function testConvertColorhexToDecimal_Characters() public {
+    function testConvertHexTripletToDecimal_Characters() public {
         // case: bad character is first
         colorhex = "g1b2c3";
-        vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
 
         // case: bad character is last
         colorhex = "a1b2cg";
-        vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
 
         // case: bad character is in the middle
         colorhex = "a1g2c3";
-        vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
 
         // case: bad character is *
         colorhex = "*1b2c3";
-        vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
 
         // case: bad character is [space]
         colorhex = "a1b c3";
-        vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
         console.log("reverted bad character is [space]");
 
         // case: bad character is ;
         colorhex = "a1b;c3";
-        vm.expectPartialRevert(ROColor__ColorhexCharacterInvalid.selector);
-        decimal = rocolor.convertColorhexToDecimal(colorhex);
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        decimal = rocolor.convertHexTripletToDecimal(colorhex);
     }
 
-    function testConvertDecimalToColorhex() public {
+    function testConvertDecimalToHexTriplet() public {
         // case: a happy path
         decimal = MURPH_LIGHT_DECIMAL;
-        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        colorhex = rocolor.convertDecimalToHexTriplet(decimal);
         assertEq(colorhex, MURPH_LIGHT_COLORHEX);
         console.log("accepted happy path");
 
         // case: smallest
         decimal = BLACK_DECIMAL;
-        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        colorhex = rocolor.convertDecimalToHexTriplet(decimal);
         assertEq(colorhex, "000000");
         console.log("accepted smallest");
 
         // case: too big
         decimal = WHITE_DECIMAL + 1;
         vm.expectPartialRevert(ROColor__DecimalTooBig.selector);
-        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        colorhex = rocolor.convertDecimalToHexTriplet(decimal);
         console.log("reverted too big");
 
         // case: biggest
         decimal = WHITE_DECIMAL;
-        colorhex = rocolor.convertDecimalToColorhex(decimal);
+        colorhex = rocolor.convertDecimalToHexTriplet(decimal);
         assertEq(colorhex, "FFFFFF");
         console.log("accepted largest");
     }
