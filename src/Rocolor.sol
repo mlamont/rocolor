@@ -25,6 +25,10 @@ contract Rocolor is ERC721 {
     // TODO use prefix of contract__
     // TODO go for cohesive naming
 
+    /// @notice Logs a deposit's sender and amount.
+    event ROColor__DepositReceived(address sender, uint256 amount);
+    event ROColor__Rename(string from, string to, uint256 tokenId);
+
     // Errors
     // TODO use prefix of contract__
     // TODO go for cohesive naming ("nounAdj")
@@ -44,11 +48,59 @@ contract Rocolor is ERC721 {
     }
 
     // receive function (if exists)
+    /// @notice Receive function to just receive sent funds, and emits an event.
+    receive() external payable {
+        emit ROColor__DepositReceived(_msgSender(), msg.value);
+    }
 
     // fallback function (if exists)
+    /// @notice Fallback function just receives any sent funds, and emits an event.
+    fallback() external payable {
+        emit ROColor__DepositReceived(_msgSender(), msg.value);
+    }
 
     // external
     // TODO add nonReentrant modifier to each
+    // ...REALLY?
+
+    function mintColor(string calldata hexTriplet, string calldata colorName) external {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        _mintColor(tokenId, colorName);
+    }
+
+    function changeColorName(string calldata hexTriplet, string calldata newColorName) external {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        _onlyColorOwner(tokenId);
+        _changeColorName(tokenId, newColorName);
+    }
+
+    function changeColorOwner(string calldata hexTriplet, address newColorOwner) external {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        // _onlyColorOwner(tokenId); // these checks are already done in ERC721-level function called from below line
+        _changeColorOwner(tokenId, newColorOwner);
+    }
+
+    function burnColor(string calldata hexTriplet) external {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        _onlyColorOwner(tokenId);
+        _burnColor(tokenId);
+    }
+
+    function getColorName(string calldata hexTriplet) external view returns (string memory) {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        return _getColorName(tokenId);
+    }
+
+    function getColorOwner(string calldata hexTriplet) external view returns (address) {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        return _getColorOwner(tokenId);
+    }
 
     // public
     // change to external if can reduce the cognitive overhead for auditors
@@ -113,41 +165,49 @@ contract Rocolor is ERC721 {
         hexTriplet = string(hexTripletBytes);
     }
 
-    function mintColor(string calldata hexTriplet, string calldata colorName) public {
-        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
-        _mintColor(tokenId, colorName);
-    }
-
-    function changeColorName(string calldata hexTriplet, string calldata newColorName) public {
-        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
-        _changeColorName(tokenId, newColorName);
-    }
-
-    function changeColorOwner(string calldata hexTriplet, address newColorOwner) public {
-        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
-        _changeColorOwner(tokenId, newColorOwner);
-    }
-
     // internal
-    function _mintColor(uint256 tokenId, string calldata colorName) internal {
-        _safeMint(msg.sender, tokenId);
+    function _mintColor(uint256 tokenId, string memory colorName) internal {
+        _safeMint(_msgSender(), tokenId);
         _changeColorName(tokenId, colorName);
     }
 
-    function _changeColorName(uint256 tokenId, string calldata newColorName) public {
+    function _changeColorName(uint256 tokenId, string memory newColorName) internal {
+        string memory oldColorName = _colorNames[tokenId];
         _colorNames[tokenId] = newColorName;
+        emit ROColor__Rename(oldColorName, newColorName, tokenId);
     }
 
-    function _changeColorOwner(uint256 tokenId, address newColorOwner) public {
-        // transfer... safe transfer... need to do the check for colorOwnership?
-        _safeTransfer(msg.sender, newColorOwner, tokenId);
+    function _changeColorOwner(uint256 tokenId, address newColorOwner) internal {
+        _safeTransfer(_msgSender(), newColorOwner, tokenId);
         // will check for, & revert for, 3 different checks per _transfer()
         // reverts if newColorOwner is the Zero address
         // reverts if tokenId is owned by noone (existing owner is the Zero address)
         // reverts if tokenId is owned by someone else (existing owner isn't function-caller)
+    }
+
+    function _burnColor(uint256 tokenId) internal {
+        // reset name to nothing, before burning
+        _changeColorName(tokenId, "");
+        // burn token
+        _burn(tokenId);
+        // reverts if tokenId is owned by noone (existing owner is the Zero address)
+        // reverts if tokenId is owned by someone else
+    }
+
+    function _getColorName(uint256 tokenId) internal view returns (string memory) {
+        return _colorNames[tokenId];
+    }
+
+    function _getColorOwner(uint256 tokenId) internal view returns (address) {
+        return ownerOf(tokenId);
+    }
+
+    function _onlyColorOwner(uint256 tokenId) internal view {
+        // reverts if tokenId is owned by noone (existing owner is the Zero address)
+        address colorOwner = _requireOwned(tokenId);
+
+        // reverts if tokenId is owned by someone else (existing owner isn't function-caller)
+        if (colorOwner != _msgSender()) revert ERC721IncorrectOwner(_msgSender(), tokenId, colorOwner);
     }
 
     // private
@@ -170,19 +230,21 @@ contract Rocolor is ERC721 {
 // name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param
 // ...
 /* mapping(uint256 => string) internal _colorNames; */
-// modifier: onlyColorOwner(tokenId)             _onlyColorOwner(tokenId)
-// receive()
-// fallback()
+/*                                               _onlyColorOwner(tokenId) */
+/* receive() */
+/* fallback() */
 // withdraw()
 /* mintColor(hexTriplet, colorName)              _mintColor(tokenId, colorName) */
-// burnColor(hexTriplet)                         _burnColor(tokenId)
-// getColorOwner(hexTriplet)                     _getColorOwner(tokenId)
-// changeColorOwner(hexTriplet, newColorOwner)   _changeColorOwner(tokenId, newColorOwner)
-// getColorName(hexTriplet)                      _getColorName(tokenId)
+/* burnColor(hexTriplet)                         _burnColor(tokenId) */
+/* getColorOwner(hexTriplet)                     _getColorOwner(tokenId) */
+/* changeColorOwner(hexTriplet, newColorOwner)   _changeColorOwner(tokenId, newColorOwner) */
+/* getColorName(hexTriplet)                      _getColorName(tokenId) */
 /* changeColorName(hexTriplet, newColorName)     _changeColorName(tokenId, newColorName) */
 /* convertDecimalToHexTriplet(decimal) */
 /* convertHexTripletToDecimal(hexTriplet) */
 // tokenURI()
+// ... TODO: put in NatSpec: where internal functions are unchecked (checks are in the external functions), beyond what ERC721 does
+// ... TODO: CEI-PI / fn
 
 // code outline of older version
 // mapping(uint => string) private _names; // should be internal
