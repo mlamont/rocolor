@@ -28,7 +28,7 @@ contract Rocolor is ERC721 {
     // Errors
     // TODO use prefix of contract__
     // TODO go for cohesive naming ("nounAdj")
-    // error ROColor__TokenIdTooBig();
+    error ROColor__TokenIdTooBig();
     error ROColor__HexTripletLengthInvalid(string hexTriplet);
     error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
     error ROColor__DecimalTooBig(uint256 decimal);
@@ -113,7 +113,42 @@ contract Rocolor is ERC721 {
         hexTriplet = string(hexTripletBytes);
     }
 
+    function mintColor(string calldata hexTriplet, string calldata colorName) public {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        _mintColor(tokenId, colorName);
+    }
+
+    function changeColorName(string calldata hexTriplet, string calldata newColorName) public {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        _changeColorName(tokenId, newColorName);
+    }
+
+    function changeColorOwner(string calldata hexTriplet, address newColorOwner) public {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        _changeColorOwner(tokenId, newColorOwner);
+    }
+
     // internal
+    function _mintColor(uint256 tokenId, string calldata colorName) internal {
+        _safeMint(msg.sender, tokenId);
+        _changeColorName(tokenId, colorName);
+    }
+
+    function _changeColorName(uint256 tokenId, string calldata newColorName) public {
+        _colorNames[tokenId] = newColorName;
+    }
+
+    function _changeColorOwner(uint256 tokenId, address newColorOwner) public {
+        // transfer... safe transfer... need to do the check for colorOwnership?
+        _safeTransfer(msg.sender, newColorOwner, tokenId);
+        // will check for, & revert for, 3 different checks per _transfer()
+        // reverts if newColorOwner is the Zero address
+        // reverts if tokenId is owned by noone (existing owner is the Zero address)
+        // reverts if tokenId is owned by someone else (existing owner isn't function-caller)
+    }
 
     // private
     // Only use private to intentionally prevent child contracts from
@@ -139,12 +174,12 @@ contract Rocolor is ERC721 {
 // receive()
 // fallback()
 // withdraw()
-// mintColor(hexTriplet, colorName)              _mintColor(tokenId, colorName)
+/* mintColor(hexTriplet, colorName)              _mintColor(tokenId, colorName) */
 // burnColor(hexTriplet)                         _burnColor(tokenId)
 // getColorOwner(hexTriplet)                     _getColorOwner(tokenId)
 // changeColorOwner(hexTriplet, newColorOwner)   _changeColorOwner(tokenId, newColorOwner)
 // getColorName(hexTriplet)                      _getColorName(tokenId)
-// changeColorName(hexTriplet, newColorName)     _changeColorName(tokenId, newColorName)
+/* changeColorName(hexTriplet, newColorName)     _changeColorName(tokenId, newColorName) */
 /* convertDecimalToHexTriplet(decimal) */
 /* convertHexTripletToDecimal(hexTriplet) */
 // tokenURI()
