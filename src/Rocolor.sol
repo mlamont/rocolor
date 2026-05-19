@@ -5,8 +5,9 @@ pragma solidity 0.8.33;
 // TODO install depedencies before import
 // TODO use labeled imports
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Rocolor is ERC721 {
+contract Rocolor is ERC721, Ownable {
     // State variables
     // think about options 4 constants & immutables & state variables, & capital'z'g
     // Only use private to intentionally prevent child contracts from
@@ -28,6 +29,7 @@ contract Rocolor is ERC721 {
     /// @notice Logs a deposit's sender and amount.
     event ROColor__DepositReceived(address sender, uint256 amount);
     event ROColor__Rename(string from, string to, uint256 tokenId);
+    event ROColor__ContractBalanceWithdrawalPassed(uint256 contractBalance);
 
     // Errors
     // TODO use prefix of contract__
@@ -36,6 +38,8 @@ contract Rocolor is ERC721 {
     error ROColor__HexTripletLengthInvalid(string hexTriplet);
     error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
     error ROColor__DecimalTooBig(uint256 decimal);
+    error ROColor__ContractBalanceWithdrawalFailed();
+    error ROColor__ContractBalanceIsEmpty();
 
     // Modifiers
     // for gas: wrap internal functions
@@ -43,7 +47,7 @@ contract Rocolor is ERC721 {
     // yes, use natspec
 
     // constructor
-    constructor() ERC721("ROColor", "ROC") {
+    constructor() ERC721("ROColor", "ROC") Ownable(_msgSender()) {
         // starting stuff
     }
 
@@ -62,6 +66,18 @@ contract Rocolor is ERC721 {
     // external
     // TODO add nonReentrant modifier to each
     // ...REALLY?
+
+    /// @notice Removes all stored funds from the contract
+    /// @dev Only the contract owner can do this.
+    function withdraw() external onlyOwner {
+        // gotta ensure the checks-effects-interactions pattern is always in here
+        uint256 balanceOfThisContract = address(this).balance;
+        if (balanceOfThisContract == 0) revert ROColor__ContractBalanceIsEmpty();
+        (bool success,) = owner().call{value: balanceOfThisContract}(""); // call() doesn't require owner() wrapped in payable()
+        if (!success) revert ROColor__ContractBalanceWithdrawalFailed();
+        // OLD: payable(owner()).transfer(balanceOfThisContract);
+        emit ROColor__ContractBalanceWithdrawalPassed(balanceOfThisContract);
+    }
 
     function mintColor(string calldata hexTriplet, string calldata colorName) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
@@ -233,7 +249,7 @@ contract Rocolor is ERC721 {
 /*                                               _onlyColorOwner(tokenId) */
 /* receive() */
 /* fallback() */
-// withdraw()
+/* withdraw() */
 /* mintColor(hexTriplet, colorName)              _mintColor(tokenId, colorName) */
 /* burnColor(hexTriplet)                         _burnColor(tokenId) */
 /* getColorOwner(hexTriplet)                     _getColorOwner(tokenId) */
