@@ -17,9 +17,7 @@ contract Rocolor is ERC721, Ownable {
     // Only use private to intentionally prevent child contracts from
     // ...accessing the variable, prefer internal for flexibility.
     // Is calculating a value on the fly cheaper than storing it?
-    /// @dev Custom string per unique tokenId, which can appear in the NFT pic.
     mapping(uint256 tokenId => string) internal _colorNames; // include "tokenId"? internal i/o private?
-    string private _name; // gotta get rid of this one... already exists in ERC721
     uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
@@ -38,7 +36,6 @@ contract Rocolor is ERC721, Ownable {
     // TODO use prefix of contract__
     // TODO go for cohesive naming
 
-    /// @notice Logs a deposit's sender and amount.
     event ROColor__DepositReceived(address sender, uint256 amount);
     event ROColor__Rename(string from, string to, uint256 tokenId);
     event ROColor__ContractBalanceWithdrawalPassed(uint256 contractBalance);
@@ -64,19 +61,34 @@ contract Rocolor is ERC721, Ownable {
     // use to improve readability & decrease code duplication
     // yes, use natspec
 
-    // constructor
+    /****
+    ***** CONSTRUCTOR
+    ****/
+
     constructor() ERC721("ROColor", "ROC") Ownable(_msgSender()) {
         // starting stuff
     }
 
-    // receive function (if exists)
-    /// @notice Receive function to just receive sent funds, and emits an event.
+    /****
+    ***** RECEIVE FUNCTION
+    ****/
+
+    /**
+     * @notice Receives funds
+     * @dev Emits a ROColor__DepositReceived event
+     */
     receive() external payable {
         emit ROColor__DepositReceived(_msgSender(), msg.value);
     }
 
-    // fallback function (if exists)
-    /// @notice Fallback function just receives any sent funds, and emits an event.
+    /****
+    ***** FALLBACK FUNCTION
+    ****/
+
+    /**
+     * @notice Receives funds
+     * @dev Emits a ROColor__DepositReceived event
+     */
     fallback() external payable {
         emit ROColor__DepositReceived(_msgSender(), msg.value);
     }
@@ -88,15 +100,20 @@ contract Rocolor is ERC721, Ownable {
     // TODO add nonReentrant modifier to each
     // ...REALLY?
 
-    /// @notice Removes all stored funds from the contract
-    /// @dev Only the contract owner can do this.
+    /**
+     * @notice Withdraws all funds from the contract, only by the contract owner
+     * @dev Reverts if contract is owned by someone else
+     * @dev Reverts if contract has no funds to withdraw
+     * @dev Reverts if fund withdrawal failed
+     * @dev Emits a ROColor__ContractBalanceWithdrawalPassed event
+     */
     function withdraw() external onlyOwner {
         // gotta ensure the checks-effects-interactions pattern is always in here
         uint256 balanceOfThisContract = address(this).balance;
         if (balanceOfThisContract == 0) revert ROColor__ContractBalanceEmpty();
-        (bool success,) = owner().call{value: balanceOfThisContract}(""); // call() doesn't require owner() wrapped in payable()
+        // call() doesn't require owner() wrapped in payable()
+        (bool success,) = owner().call{value: balanceOfThisContract}("");
         if (!success) revert ROColor__ContractBalanceWithdrawalFailed();
-        // OLD: payable(owner()).transfer(balanceOfThisContract);
         emit ROColor__ContractBalanceWithdrawalPassed(balanceOfThisContract);
     }
 
@@ -172,12 +189,27 @@ contract Rocolor is ERC721, Ownable {
         _burnColor(tokenId);
     }
 
+    /**
+     * @notice Gets the name of a ROColor token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @param hexTriplet Hex triplet of the ROColor
+     */
     function getColorName(string calldata hexTriplet) external view returns (string memory) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
         return _getColorName(tokenId);
     }
 
+    /**
+     * @notice Gets the owner of a ROColor token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if token is not currently owned/minted
+     * @param hexTriplet Hex triplet of the ROColor
+     */
     function getColorOwner(string calldata hexTriplet) external view returns (address) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
@@ -190,12 +222,6 @@ contract Rocolor is ERC721, Ownable {
 
     // change to external if can reduce the cognitive overhead for auditors
     // ...b/c it reduces the number of possible contexts in which the function can be called
-
-    // function ownerOf(string calldata colorhex) public view returns (address) {
-    //     uint256 tokenId = convertColorhexToDecimal(colorhex); // convert colorhex to tokenId
-    //     if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(); // validate tokenId
-    //     return ownerOf(tokenId);
-    // }
 
     // NOTE: this is the function to optimize the most: called all the time!
     // TODO: learn & use bit operations i/o arithmatic
@@ -335,19 +361,34 @@ contract Rocolor is ERC721, Ownable {
         _burn(tokenId);
     }
 
+    /**
+     * @notice Gets the name of a ROColor token
+     * @dev No input validations
+     * @param tokenId Token ID of the ROColor
+     */
     function _getColorName(uint256 tokenId) internal view returns (string memory) {
         return _colorNames[tokenId];
     }
 
+    /**
+     * @notice Gets the owner of a ROColor token
+     * @dev No input validations beyond ERC721 base contract token-owner-getting validations
+     * @dev Reverts if token is not currently owned/minted
+     * @param tokenId Token ID of the ROColor
+     */
     function _getColorOwner(uint256 tokenId) internal view returns (address) {
         return ownerOf(tokenId);
     }
 
+    /**
+     * @notice Allows only the owner of a ROColor token to continue
+     * @dev No input validations beyond ERC721 base contract token-owner-getting validations
+     * @dev Reverts if token is not currently owned/minted
+     * @dev Reverts if token is owned by someone else
+     * @param tokenId Token ID of the ROColor
+     */
     function _allowOnlyColorOwner(uint256 tokenId) internal view {
-        // reverts if tokenId is owned by noone (existing owner is the Zero address)
         address colorOwner = _requireOwned(tokenId);
-
-        // reverts if tokenId is owned by someone else (existing owner isn't function-caller)
         if (colorOwner != _msgSender()) revert ERC721IncorrectOwner(_msgSender(), tokenId, colorOwner);
     }
 
@@ -359,14 +400,6 @@ contract Rocolor is ERC721, Ownable {
     // ...calling the function, prefer internal for flexibility.
 
     // within each: view & pure f'n.s last
-
-    function setName(string memory name) public {
-        _name = name;
-    }
-
-    function getName() public view returns (string memory) {
-        return _name;
-    }
 }
 
 // code outline of newer version
