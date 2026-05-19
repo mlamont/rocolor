@@ -9,7 +9,10 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract Rocolor is ERC721, Ownable {
-    // State variables
+    /****
+    ***** STATE VARIABLES
+    ****/
+
     // think about options 4 constants & immutables & state variables, & capital'z'g
     // Only use private to intentionally prevent child contracts from
     // ...accessing the variable, prefer internal for flexibility.
@@ -21,8 +24,16 @@ contract Rocolor is ERC721, Ownable {
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
     uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
+    string private constant _SVG_PART_1 =
+        '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="50%" y="16" text-anchor="middle" rotate="180" style="fill: black; font-size: 35px;">&#9814;</text><text x="50%" y="320" text-anchor="middle" class="base">';
+    string private constant _SVG_PART_2 = '</text><text x="50%" y="337" text-anchor="middle" class="base">#';
+    string private constant _SVG_PART_3 = '</text><rect x="50" y="50" width="250" height="250" fill="#';
+    string private constant _SVG_PART_4 = '" /></svg>';
 
-    // Events
+    /****
+    ***** EVENTS
+    ****/
+
     // TODO emit when storage variable updated ("nounVerbed")
     // TODO use prefix of contract__
     // TODO go for cohesive naming
@@ -32,7 +43,10 @@ contract Rocolor is ERC721, Ownable {
     event ROColor__Rename(string from, string to, uint256 tokenId);
     event ROColor__ContractBalanceWithdrawalPassed(uint256 contractBalance);
 
-    // Errors
+    /****
+    ***** ERRORS
+    ****/
+
     // TODO use prefix of contract__
     // TODO go for cohesive naming ("nounAdj")
     error ROColor__TokenIdTooBig();
@@ -40,9 +54,12 @@ contract Rocolor is ERC721, Ownable {
     error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
     error ROColor__DecimalTooBig(uint256 decimal);
     error ROColor__ContractBalanceWithdrawalFailed();
-    error ROColor__ContractBalanceIsEmpty();
+    error ROColor__ContractBalanceEmpty();
 
-    // Modifiers
+    /****
+    ***** MODIFIERS
+    ****/
+
     // for gas: wrap internal functions
     // use to improve readability & decrease code duplication
     // yes, use natspec
@@ -64,7 +81,10 @@ contract Rocolor is ERC721, Ownable {
         emit ROColor__DepositReceived(_msgSender(), msg.value);
     }
 
-    // external
+    /****
+    ***** EXTERNAL FUNCTIONS
+    ****/
+
     // TODO add nonReentrant modifier to each
     // ...REALLY?
 
@@ -73,37 +93,82 @@ contract Rocolor is ERC721, Ownable {
     function withdraw() external onlyOwner {
         // gotta ensure the checks-effects-interactions pattern is always in here
         uint256 balanceOfThisContract = address(this).balance;
-        if (balanceOfThisContract == 0) revert ROColor__ContractBalanceIsEmpty();
+        if (balanceOfThisContract == 0) revert ROColor__ContractBalanceEmpty();
         (bool success,) = owner().call{value: balanceOfThisContract}(""); // call() doesn't require owner() wrapped in payable()
         if (!success) revert ROColor__ContractBalanceWithdrawalFailed();
         // OLD: payable(owner()).transfer(balanceOfThisContract);
         emit ROColor__ContractBalanceWithdrawalPassed(balanceOfThisContract);
     }
 
+    /**
+     * @notice Creates a ROColor named color token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if minting to the burn address
+     * @dev Reverts if token already exists
+     * @dev Emits a Transfer event
+     * @dev Emits a ROColor__Rename event
+     * @param hexTriplet Hex triplet of the ROColor
+     * @param colorName Name of the ROColor
+     */
     function mintColor(string calldata hexTriplet, string calldata colorName) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
         _mintColor(tokenId, colorName);
     }
 
+    /**
+     * @notice Changes the name of a ROColor token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if token is not currently owned/minted
+     * @dev Reverts if token is owned by someone else
+     * @dev Emits a ROColor__Rename event
+     * @param hexTriplet Hex triplet of the ROColor
+     * @param newColorName Name of the ROColor
+     */
     function changeColorName(string calldata hexTriplet, string calldata newColorName) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
-        _onlyColorOwner(tokenId);
+        _allowOnlyColorOwner(tokenId);
         _changeColorName(tokenId, newColorName);
     }
 
+    /**
+     * @notice Changes the owner of a ROColor token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if transfering to the burn address
+     * @dev Reverts if token is not currently owned/minted
+     * @dev Reverts if token is owned by someone else
+     * @dev Emits a Transfer event
+     * @param hexTriplet Hex triplet of the ROColor
+     * @param newColorOwner Owner of the ROColor
+     */
     function changeColorOwner(string calldata hexTriplet, address newColorOwner) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
-        // _onlyColorOwner(tokenId); // these checks are already done in ERC721-level function called from below line
         _changeColorOwner(tokenId, newColorOwner);
     }
 
+    /**
+     * @notice Destroys a ROColor named color token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if token is not currently owned/minted
+     * @dev Reverts if token is owned by someone else
+     * @dev Emits a Transfer event
+     * @dev Emits a ROColor__Rename event
+     * @param hexTriplet Hex triplet of the ROColor
+     */
     function burnColor(string calldata hexTriplet) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
-        _onlyColorOwner(tokenId);
+        _allowOnlyColorOwner(tokenId);
         _burnColor(tokenId);
     }
 
@@ -119,7 +184,10 @@ contract Rocolor is ERC721, Ownable {
         return _getColorOwner(tokenId);
     }
 
-    // public
+    /****
+    ***** PUBLIC FUNCTIONS
+    ****/
+
     // change to external if can reduce the cognitive overhead for auditors
     // ...b/c it reduces the number of possible contexts in which the function can be called
 
@@ -182,35 +250,89 @@ contract Rocolor is ERC721, Ownable {
         hexTriplet = string(hexTripletBytes);
     }
 
-    // tokenId() will go here
+    function tokenURI(uint256 tokenId) public view override returns (string memory tokenUri) {
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        string memory colorName = _getColorName(tokenId);
+        string memory hexTriplet = convertDecimalToHexTriplet(tokenId);
 
-    // internal
+        // Pack SVG parts directly into bytes
+        bytes memory svgBytes =
+            abi.encodePacked(_SVG_PART_1, colorName, _SVG_PART_2, hexTriplet, _SVG_PART_3, hexTriplet, _SVG_PART_4);
+
+        // Base64 encode the SVG bytes
+        string memory encodedSvg = Base64.encode(svgBytes);
+
+        // Create and encode the JSON directly
+        bytes memory jsonBytes = abi.encodePacked(
+            '{"name": "',
+            colorName,
+            '", "description": "a ROColor for onchain art", "image": ',
+            '"data:image/svg+xml;base64,',
+            encodedSvg,
+            '"}'
+        );
+
+        // Base64 encode the JSON and create the final URI
+        tokenUri = string(abi.encodePacked("data:application/json;base64,", Base64.encode(jsonBytes)));
+    }
+
+    /****
+    ***** INTERNAL FUNCTIONS
+    ****/
+
+    /**
+     * @notice Creates a ROColor named color token
+     * @dev No input validations beyond ERC721 base contract token-minting validations
+     * @dev Reverts if minting to the burn address
+     * @dev Reverts if token already exists
+     * @dev Emits a Transfer event
+     * @dev Emits a ROColor__Rename event
+     * @param tokenId Token ID of the ROColor
+     * @param colorName Name of the ROColor
+     */
     function _mintColor(uint256 tokenId, string memory colorName) internal {
         _safeMint(_msgSender(), tokenId);
         _changeColorName(tokenId, colorName);
     }
 
+    /**
+     * @notice Changes the name of a ROColor token
+     * @dev No input validations
+     * @dev Emits a ROColor__Rename event
+     * @param tokenId Token ID of the ROColor
+     * @param newColorName Name of the ROColor
+     */
     function _changeColorName(uint256 tokenId, string memory newColorName) internal {
         string memory oldColorName = _colorNames[tokenId];
         _colorNames[tokenId] = newColorName;
         emit ROColor__Rename(oldColorName, newColorName, tokenId);
     }
 
+    /**
+     * @notice Changes the owner of a ROColor token
+     * @dev No input validations beyond ERC721 base contract token-transfering validations
+     * @dev Reverts if transfering to the burn address
+     * @dev Reverts if token is not currently owned/minted
+     * @dev Reverts if token is owned by someone else
+     * @dev Emits a Transfer event
+     * @param tokenId Token ID of the ROColor
+     * @param newColorOwner Owner of the ROColor
+     */
     function _changeColorOwner(uint256 tokenId, address newColorOwner) internal {
         _safeTransfer(_msgSender(), newColorOwner, tokenId);
-        // will check for, & revert for, 3 different checks per _transfer()
-        // reverts if newColorOwner is the Zero address
-        // reverts if tokenId is owned by noone (existing owner is the Zero address)
-        // reverts if tokenId is owned by someone else (existing owner isn't function-caller)
     }
 
+    /**
+     * @notice Destroys a ROColor named color token
+     * @dev No input validations beyond ERC721 base contract token-burning validations
+     * @dev Reverts if token is not currently owned/minted
+     * @dev Emits a Transfer event
+     * @dev Emits a ROColor__Rename event
+     * @param tokenId Token ID of the ROColor
+     */
     function _burnColor(uint256 tokenId) internal {
-        // reset name to nothing, before burning
         _changeColorName(tokenId, "");
-        // burn token
         _burn(tokenId);
-        // reverts if tokenId is owned by noone (existing owner is the Zero address)
-        // reverts if tokenId is owned by someone else
     }
 
     function _getColorName(uint256 tokenId) internal view returns (string memory) {
@@ -221,7 +343,7 @@ contract Rocolor is ERC721, Ownable {
         return ownerOf(tokenId);
     }
 
-    function _onlyColorOwner(uint256 tokenId) internal view {
+    function _allowOnlyColorOwner(uint256 tokenId) internal view {
         // reverts if tokenId is owned by noone (existing owner is the Zero address)
         address colorOwner = _requireOwned(tokenId);
 
@@ -229,7 +351,10 @@ contract Rocolor is ERC721, Ownable {
         if (colorOwner != _msgSender()) revert ERC721IncorrectOwner(_msgSender(), tokenId, colorOwner);
     }
 
-    // private
+    /****
+    ***** PRIVATE FUNCTIONS
+    ****/
+
     // Only use private to intentionally prevent child contracts from
     // ...calling the function, prefer internal for flexibility.
 
@@ -245,11 +370,8 @@ contract Rocolor is ERC721, Ownable {
 }
 
 // code outline of newer version
-// only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
-// name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param
-// ...
 /* mapping(uint256 => string) internal _colorNames; */
-/*                                               _onlyColorOwner(tokenId) */
+/*                                               _allowOnlyColorOwner(tokenId) */
 /* receive() */
 /* fallback() */
 /* withdraw() */
@@ -261,9 +383,11 @@ contract Rocolor is ERC721, Ownable {
 /* changeColorName(hexTriplet, newColorName)     _changeColorName(tokenId, newColorName) */
 /* convertDecimalToHexTriplet(decimal) */
 /* convertHexTripletToDecimal(hexTriplet) */
-// tokenURI()
-// ... TODO: put in NatSpec: where internal functions are unchecked (checks are in the external functions), beyond what ERC721 does
-// ... TODO: CEI-PI / fn
+/* tokenURI() */
+// ... TODO: NAMING: name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param
+// ... TODO: SCOPE: only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
+// ... TODO: DOC: put in NatSpec: where internal functions are unchecked (checks are in the external functions), beyond what ERC721 does
+// ... TODO: SECURITY: CEI-PI / fn
 
 // code outline of older version
 // mapping(uint => string) private _names; // should be internal
