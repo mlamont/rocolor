@@ -39,7 +39,11 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~write unit tests, then code, for converting decimal to colorhex~~
 - ~~document the logic of the 2 conversion functions like a pro: what comments are before vs inline~~
 - ~~name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param~~
+- ~~code all functions for free service~~
+- code functions for incorporating price
+- compare new functions to functions of previous version
 - only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
+- CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
 - for mathy bits: multiply before divide
 - secure 'selfdestruct'
 - DOC steps to code this PRJ for a newb
@@ -47,7 +51,6 @@ Rebuild two repositories into this one, tracked via the following...
 - set & use Helper.Config.s.sol for NetworkConfig for deploy script
 - test functions += modifiers (to modularize)
 - maybe use a MAKE file
-- CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
 - cannot compare strings, so compare (bytes32) hashed encoded ones
 - FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - do static analysis eg Slither / Mythril

@@ -19,6 +19,7 @@ contract Rocolor is ERC721, Ownable {
     mapping(uint256 tokenId => string) internal _colorNames; // include "tokenId"? internal i/o private?
     uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
+    uint256 private constant COLOR_NAME_MAX_LENGTH = 32;
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
     uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
     string private constant _SVG_PART_1 =
@@ -43,10 +44,10 @@ contract Rocolor is ERC721, Ownable {
     ****/
 
     // TODO go for cohesive naming ("nounAdj")
-    error ROColor__TokenIdTooBig();
+    error ROColor__TokenIdTooBig(uint256 tokenId);
     error ROColor__HexTripletLengthInvalid(string hexTriplet);
     error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
-    error ROColor__DecimalTooBig(uint256 decimal);
+    error ROColor__ColorNameTooBig(string colorName);
     error ROColor__ContractBalanceWithdrawalFailed();
     error ROColor__ContractBalanceEmpty();
 
@@ -119,6 +120,8 @@ contract Rocolor is ERC721, Ownable {
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
+     * @dev Reverts if name length is over 32 bytes
      * @dev Reverts if minting to the burn address
      * @dev Reverts if token already exists
      * @dev Emits a Transfer event
@@ -128,7 +131,8 @@ contract Rocolor is ERC721, Ownable {
      */
     function mintColor(string calldata hexTriplet, string calldata colorName) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
+        if (bytes(colorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(colorName);
         _mintColor(tokenId, colorName);
     }
 
@@ -137,6 +141,8 @@ contract Rocolor is ERC721, Ownable {
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
+     * @dev Reverts if name length is over 32 bytes
      * @dev Reverts if token is not currently owned/minted
      * @dev Reverts if token is owned by someone else
      * @dev Emits a ROColor__Rename event
@@ -145,7 +151,8 @@ contract Rocolor is ERC721, Ownable {
      */
     function changeColorName(string calldata hexTriplet, string calldata newColorName) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
+        if (bytes(newColorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(newColorName);
         _allowOnlyColorOwner(tokenId);
         _changeColorName(tokenId, newColorName);
     }
@@ -155,6 +162,7 @@ contract Rocolor is ERC721, Ownable {
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
      * @dev Reverts if transfering to the burn address
      * @dev Reverts if token is not currently owned/minted
      * @dev Reverts if token is owned by someone else
@@ -164,7 +172,7 @@ contract Rocolor is ERC721, Ownable {
      */
     function changeColorOwner(string calldata hexTriplet, address newColorOwner) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         _changeColorOwner(tokenId, newColorOwner);
     }
 
@@ -173,6 +181,7 @@ contract Rocolor is ERC721, Ownable {
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
      * @dev Reverts if token is not currently owned/minted
      * @dev Reverts if token is owned by someone else
      * @dev Emits a Transfer event
@@ -181,7 +190,7 @@ contract Rocolor is ERC721, Ownable {
      */
     function burnColor(string calldata hexTriplet) external {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         _allowOnlyColorOwner(tokenId);
         _burnColor(tokenId);
     }
@@ -191,11 +200,12 @@ contract Rocolor is ERC721, Ownable {
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
      * @param hexTriplet Hex triplet of the ROColor
      */
     function getColorName(string calldata hexTriplet) external view returns (string memory) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         return _getColorName(tokenId);
     }
 
@@ -204,12 +214,13 @@ contract Rocolor is ERC721, Ownable {
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
      * @dev Reverts if token is not currently owned/minted
      * @param hexTriplet Hex triplet of the ROColor
      */
     function getColorOwner(string calldata hexTriplet) external view returns (address) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         return _getColorOwner(tokenId);
     }
 
@@ -261,7 +272,7 @@ contract Rocolor is ERC721, Ownable {
      * @return hexTriplet A hexadecimal number, likely a web color hex triplet
      */
     function convertDecimalToHexTriplet(uint256 decimal) public pure returns (string memory hexTriplet) {
-        if (decimal > TOKEN_ID_MAX) revert ROColor__DecimalTooBig(decimal);
+        if (decimal > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(decimal);
         bytes memory hexTripletBytes = new bytes(HEX_TRIPLET_VALID_LENGTH);
         for (uint256 i = 1; i < (HEX_TRIPLET_VALID_LENGTH + 1);) {
             hexTripletBytes[HEX_TRIPLET_VALID_LENGTH - i] = HEX_SYMBOLS[decimal & 0xF];
@@ -281,7 +292,7 @@ contract Rocolor is ERC721, Ownable {
      * @return tokenUri Token URI, with SVG picture, of the ROColor
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory tokenUri) {
-        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         string memory colorName = _getColorName(tokenId);
         string memory hexTriplet = convertDecimalToHexTriplet(tokenId);
 
