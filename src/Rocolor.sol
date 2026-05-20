@@ -49,6 +49,7 @@ contract Rocolor is ERC721, Ownable {
     error ROColor__HexTripletLengthInvalid(string hexTriplet);
     error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
     error ROColor__ColorNameTooBig(string colorName);
+    error ROColor__FundsInsufficient();
     error ROColor__ContractBalanceWithdrawalFailed();
     error ROColor__ContractBalanceEmpty();
 
@@ -118,11 +119,12 @@ contract Rocolor is ERC721, Ownable {
 
     /**
      * @notice Creates a ROColor named color token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
      * @dev Reverts if name length is over 32 bytes
+     * @dev Reverts if funds are less than the price of the color token
      * @dev Reverts if minting to the burn address
      * @dev Reverts if token already exists
      * @dev Emits a Transfer event
@@ -130,16 +132,17 @@ contract Rocolor is ERC721, Ownable {
      * @param hexTriplet Hex triplet of the ROColor
      * @param colorName Name of the ROColor
      */
-    function mintColor(string calldata hexTriplet, string calldata colorName) external {
+    function mintColor(string calldata hexTriplet, string calldata colorName) external payable {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         if (bytes(colorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(colorName);
+        if (msg.value < _getColorPrice(tokenId)) revert ROColor__FundsInsufficient();
         _mintColor(tokenId, colorName);
     }
 
     /**
      * @notice Changes the name of a ROColor token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
@@ -160,7 +163,7 @@ contract Rocolor is ERC721, Ownable {
 
     /**
      * @notice Changes the owner of a ROColor token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
@@ -179,7 +182,7 @@ contract Rocolor is ERC721, Ownable {
 
     /**
      * @notice Destroys a ROColor named color token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
@@ -198,7 +201,7 @@ contract Rocolor is ERC721, Ownable {
 
     /**
      * @notice Gets the name of a ROColor token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
@@ -213,7 +216,7 @@ contract Rocolor is ERC721, Ownable {
 
     /**
      * @notice Gets the owner of a ROColor token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
@@ -229,7 +232,7 @@ contract Rocolor is ERC721, Ownable {
 
     /**
      * @notice Gets the price of a ROColor token
-     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
      * @param hexTriplet Hex triplet of the ROColor
      * @return colorPrice Price of the ROColor
      */
@@ -336,6 +339,7 @@ contract Rocolor is ERC721, Ownable {
     ***** INTERNAL FUNCTIONS
     ****/
 
+    // TODO make this payable?
     /**
      * @notice Creates a ROColor named color token
      * @dev No input validations beyond ERC721 base contract token-minting validations
