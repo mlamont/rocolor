@@ -203,11 +203,12 @@ contract Rocolor is ERC721, Ownable {
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
      * @param hexTriplet Hex triplet of the ROColor
+     * @return colorName Name of the ROColor
      */
-    function getColorName(string calldata hexTriplet) external view returns (string memory) {
+    function getColorName(string calldata hexTriplet) external view returns (string memory colorName) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
-        return _getColorName(tokenId);
+        colorName = _getColorName(tokenId);
     }
 
     /**
@@ -218,22 +219,24 @@ contract Rocolor is ERC721, Ownable {
      * @dev Reverts if calculated tokenId is 2^24 or greater
      * @dev Reverts if token is not currently owned/minted
      * @param hexTriplet Hex triplet of the ROColor
+     * @return colorOwner Owner of the ROColor
      */
-    function getColorOwner(string calldata hexTriplet) external view returns (address) {
+    function getColorOwner(string calldata hexTriplet) external view returns (address colorOwner) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
-        return _getColorOwner(tokenId);
+        colorOwner = _getColorOwner(tokenId);
     }
 
     /**
      * @notice Gets the price of a ROColor token
      * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
      * @param hexTriplet Hex triplet of the ROColor
+     * @return colorPrice Price of the ROColor
      */
-    function getColorPrice(string calldata hexTriplet) external pure returns (uint256) {
+    function getColorPrice(string calldata hexTriplet) external pure returns (uint256 colorPrice) {
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
-        return _getColorPrice(tokenId);
+        colorPrice = _getColorPrice(tokenId);
     }
 
     /****
@@ -392,9 +395,10 @@ contract Rocolor is ERC721, Ownable {
      * @notice Gets the name of a ROColor token
      * @dev No input validations
      * @param tokenId Token ID of the ROColor
+     * @return colorName Name of the ROColor
      */
-    function _getColorName(uint256 tokenId) internal view returns (string memory) {
-        return _colorNames[tokenId];
+    function _getColorName(uint256 tokenId) internal view returns (string memory colorName) {
+        colorName = _colorNames[tokenId];
     }
 
     /**
@@ -402,17 +406,19 @@ contract Rocolor is ERC721, Ownable {
      * @dev No input validations beyond ERC721 base contract token-owner-getting validations
      * @dev Reverts if token is not currently owned/minted
      * @param tokenId Token ID of the ROColor
+     * @return colorOwner Owner of the ROColor
      */
-    function _getColorOwner(uint256 tokenId) internal view returns (address) {
-        return ownerOf(tokenId);
+    function _getColorOwner(uint256 tokenId) internal view returns (address colorOwner) {
+        colorOwner = ownerOf(tokenId);
     }
 
     /**
      * @notice Gets the price of a ROColor token
      * @dev Constructs price as the product of a minimum and a factor representing pricing tiers
      * @param tokenId Token ID of the ROColor
+     * @return colorPrice Price of the ROColor
      */
-    function _getColorPrice(uint256 tokenId) internal pure returns (uint256) {
+    function _getColorPrice(uint256 tokenId) internal pure returns (uint256 colorPrice) {
         uint256 colorPriceMultiplier = 1;
 
         // if tokenId if the biggies, then multiplier is biggest
@@ -427,7 +433,7 @@ contract Rocolor is ERC721, Ownable {
         ) {
             colorPriceMultiplier = 1000;
         }
-        return COLOR_PRICE_MIN * colorPriceMultiplier;
+        colorPrice = COLOR_PRICE_MIN * colorPriceMultiplier;
     }
 
     /**
