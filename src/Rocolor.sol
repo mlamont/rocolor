@@ -22,6 +22,7 @@ contract Rocolor is ERC721, Ownable {
     uint256 private constant COLOR_NAME_MAX_LENGTH = 32;
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
     uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
+    uint256 private constant COLOR_PRICE_MIN = 0.001 ether;
     string private constant _SVG_PART_1 =
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="50%" y="16" text-anchor="middle" rotate="180" style="fill: black; font-size: 35px;">&#9814;</text><text x="50%" y="320" text-anchor="middle" class="base">';
     string private constant _SVG_PART_2 = '</text><text x="50%" y="337" text-anchor="middle" class="base">#';
@@ -224,6 +225,17 @@ contract Rocolor is ERC721, Ownable {
         return _getColorOwner(tokenId);
     }
 
+    /**
+     * @notice Gets the price of a ROColor token
+     * @dev Converts hex triplet to tokenId, validates it, then passes to internal function
+     * @param hexTriplet Hex triplet of the ROColor
+     */
+    function getColorPrice(string calldata hexTriplet) external pure returns (uint256) {
+        uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
+        if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
+        return _getColorPrice(tokenId);
+    }
+
     /****
     ***** PUBLIC FUNCTIONS
     ****/
@@ -393,6 +405,29 @@ contract Rocolor is ERC721, Ownable {
      */
     function _getColorOwner(uint256 tokenId) internal view returns (address) {
         return ownerOf(tokenId);
+    }
+
+    /**
+     * @notice Gets the price of a ROColor token
+     * @dev Constructs price as the product of a minimum and a factor representing pricing tiers
+     * @param tokenId Token ID of the ROColor
+     */
+    function _getColorPrice(uint256 tokenId) internal pure returns (uint256) {
+        uint256 colorPriceMultiplier = 1;
+
+        // if tokenId if the biggies, then multiplier is biggest
+        if (tokenId == 0 || tokenId == TOKEN_ID_MAX) {
+            colorPriceMultiplier = 10000;
+        }
+
+        // if tokenId is the middies, then multiplier is middest
+        if (
+            tokenId == 255 || tokenId == 65280 || tokenId == 16711680 || tokenId == 65535 || tokenId == 16711935
+                || tokenId == 16776960
+        ) {
+            colorPriceMultiplier = 1000;
+        }
+        return COLOR_PRICE_MIN * colorPriceMultiplier;
     }
 
     /**
