@@ -3,7 +3,6 @@
 pragma solidity 0.8.33;
 
 // TODO install depedencies before import
-// TODO use labeled imports
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
@@ -33,7 +32,6 @@ contract Rocolor is ERC721, Ownable {
     ****/
 
     // TODO emit when storage variable updated ("nounVerbed")
-    // TODO use prefix of contract__
     // TODO go for cohesive naming
 
     event ROColor__DepositReceived(address sender, uint256 amount);
@@ -44,7 +42,6 @@ contract Rocolor is ERC721, Ownable {
     ***** ERRORS
     ****/
 
-    // TODO use prefix of contract__
     // TODO go for cohesive naming ("nounAdj")
     error ROColor__TokenIdTooBig();
     error ROColor__HexTripletLengthInvalid(string hexTriplet);
@@ -276,6 +273,13 @@ contract Rocolor is ERC721, Ownable {
         hexTriplet = string(hexTripletBytes);
     }
 
+    /**
+     * @notice Gets the tokenURI, with SVG picture, of a ROColor token
+     * @dev Constructs, packs, and Base64-encodes the metadata associated with a tokenId
+     * @dev Reverts if input is 2^24 or greater
+     * @param tokenId Token ID of the ROColor
+     * @return tokenUri Token URI, with SVG picture, of the ROColor
+     */
     function tokenURI(uint256 tokenId) public view override returns (string memory tokenUri) {
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig();
         string memory colorName = _getColorName(tokenId);
