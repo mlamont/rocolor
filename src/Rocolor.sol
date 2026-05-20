@@ -7,6 +7,12 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
+/**
+ * @title ROColor
+ * @author Merrill B. Lamont III (rockopera.eth)
+ * @notice Own a color. Name that color. Make art onchain.
+ * @dev Onchain art tech for onchain art work: 1 NFT color swatch for each of the 16M+ web colors.
+ */
 contract Rocolor is ERC721, Ownable {
     /****
     ***** STATE VARIABLES
@@ -36,9 +42,9 @@ contract Rocolor is ERC721, Ownable {
     // TODO emit when storage variable updated ("nounVerbed")
     // TODO go for cohesive naming
 
-    event ROColor__DepositReceived(address sender, uint256 amount);
-    event ROColor__Rename(string from, string to, uint256 tokenId);
-    event ROColor__ContractBalanceWithdrawalPassed(uint256 contractBalance);
+    event ROColor__DepositReceived(address indexed sender, uint256 indexed amount);
+    event ROColor__Rename(string indexed from, string indexed to, uint256 indexed tokenId);
+    event ROColor__ContractBalanceWithdrawalPassed(uint256 indexed contractBalance);
 
     /****
     ***** ERRORS
@@ -100,6 +106,7 @@ contract Rocolor is ERC721, Ownable {
     // TODO add nonReentrant modifier to each
     // ...REALLY?
 
+    // TODO deep review of each line
     /**
      * @notice Withdraws all funds from the contract, only by the contract owner
      * @dev Reverts if contract is owned by someone else
@@ -133,9 +140,9 @@ contract Rocolor is ERC721, Ownable {
      * @param colorName Name of the ROColor
      */
     function mintColor(string calldata hexTriplet, string calldata colorName) external payable {
+        if (bytes(colorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(colorName); // cheap checks first
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
-        if (bytes(colorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(colorName);
         if (msg.value < _getColorPrice(tokenId)) revert ROColor__FundsInsufficient();
         _mintColor(tokenId, colorName);
     }
@@ -154,9 +161,9 @@ contract Rocolor is ERC721, Ownable {
      * @param newColorName Name of the ROColor
      */
     function changeColorName(string calldata hexTriplet, string calldata newColorName) external {
+        if (bytes(newColorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(newColorName); // cheap checks first
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
-        if (bytes(newColorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(newColorName);
         _allowOnlyColorOwner(tokenId);
         _changeColorName(tokenId, newColorName);
     }
@@ -250,6 +257,7 @@ contract Rocolor is ERC721, Ownable {
     // ...b/c it reduces the number of possible contexts in which the function can be called
 
     // NOTE: this is the function to optimize the most: called all the time!
+    // TODO rename 'a' to 'asciiNumber'? also, the casts seem awkward
     // TODO: learn & use bit operations i/o arithmatic
     // TODO: get function title to have lowest selector number, so less run-t gas in finding it
     /**
@@ -265,7 +273,7 @@ contract Rocolor is ERC721, Ownable {
         if (hexTripletBytes.length != HEX_TRIPLET_VALID_LENGTH) revert ROColor__HexTripletLengthInvalid(hexTriplet);
         for (uint256 i; i < HEX_TRIPLET_VALID_LENGTH;) {
             bytes1 hexTripletByte = hexTripletBytes[(HEX_TRIPLET_VALID_LENGTH - 1) - i];
-            uint256 a = uint8(hexTripletByte); // rename 'a' to 'asciiNumber'? also, the casts seem awkward
+            uint256 a = uint8(hexTripletByte);
             unchecked {
                 // ASCII ranges: 0-9 (48-57), A-F (65-70), a-f (97-102)
                 if (a > 47 && a < 58) {
@@ -313,15 +321,9 @@ contract Rocolor is ERC721, Ownable {
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
         string memory colorName = _getColorName(tokenId);
         string memory hexTriplet = convertDecimalToHexTriplet(tokenId);
-
-        // Pack SVG parts directly into bytes
         bytes memory svgBytes =
             abi.encodePacked(_SVG_PART_1, colorName, _SVG_PART_2, hexTriplet, _SVG_PART_3, hexTriplet, _SVG_PART_4);
-
-        // Base64 encode the SVG bytes
         string memory encodedSvg = Base64.encode(svgBytes);
-
-        // Create and encode the JSON directly
         bytes memory jsonBytes = abi.encodePacked(
             '{"name": "',
             colorName,
@@ -330,8 +332,6 @@ contract Rocolor is ERC721, Ownable {
             encodedSvg,
             '"}'
         );
-
-        // Base64 encode the JSON and create the final URI
         tokenUri = string(abi.encodePacked("data:application/json;base64,", Base64.encode(jsonBytes)));
     }
 
@@ -340,6 +340,8 @@ contract Rocolor is ERC721, Ownable {
     ****/
 
     // TODO make this payable?
+    // TODO: learn & use: bit operations & bitmaps to reduce comparisons, and punt price check to end
+    // TODO: investigate WARNING: minting is a source of reentrancy: it calls IERC721Receiver().onERC721received()
     /**
      * @notice Creates a ROColor named color token
      * @dev No input validations beyond ERC721 base contract token-minting validations
@@ -398,6 +400,7 @@ contract Rocolor is ERC721, Ownable {
     /**
      * @notice Gets the name of a ROColor token
      * @dev No input validations
+     * @dev Does not revert if token is not currently owned/minted
      * @param tokenId Token ID of the ROColor
      * @return colorName Name of the ROColor
      */
@@ -416,6 +419,11 @@ contract Rocolor is ERC721, Ownable {
         colorOwner = ownerOf(tokenId);
     }
 
+    // TODO comment to include color names w/ tokenIds
+    // TODO learn & use: bit operations & bitmaps to reduce comparisons
+    // TODO if & elseif instead of 2 separate ifs
+    // TODO investigate if can say token IS IN {255, 65280, ...}
+    // TODO consider unchecked {}
     /**
      * @notice Gets the price of a ROColor token
      * @dev Constructs price as the product of a minimum and a factor representing pricing tiers

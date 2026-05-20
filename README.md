@@ -42,8 +42,8 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~code all functions for free service~~
 - ~~have getter functions return a named variable, and NapSpec it (err on the side of readability & documentation, then scale back)~~
 - ~~code functions for incorporating price~~
-- compare new functions to functions of previous version
-- only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
+- ~~compare new functions to functions of previous version~~
+- ~~only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name~~
 - CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
 - for mathy bits: multiply before divide
 - secure 'selfdestruct'
