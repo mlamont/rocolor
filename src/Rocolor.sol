@@ -22,7 +22,8 @@ contract Rocolor is ERC721, Ownable {
     // Only use private to intentionally prevent child contracts from
     // ...accessing the variable, prefer internal for flexibility.
     // Is calculating a value on the fly cheaper than storing it?
-    mapping(uint256 tokenId => string) internal _colorNames; // include "tokenId"? internal i/o private?
+    mapping(uint256 tokenId => string) internal _colorNames; // TODO include "tokenId"? internal i/o private?
+
     uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
     uint256 private constant COLOR_NAME_MAX_LENGTH = 32;

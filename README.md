@@ -46,22 +46,22 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name~~
 - ~~Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.~~
 - ~~Comment the "why" as much as possible.~~
-- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
-- CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
 - for mathy bits: multiply before divide
+- CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
+- Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
 - secure 'selfdestruct'
+- aim: readability ... in turn, improved maintainability
 - DOC steps to code this PRJ for a newb
-- testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
 - set & use Helper.Config.s.sol for NetworkConfig for deploy script
-- test functions += modifiers (to modularize)
 - maybe use a MAKE file
-- cannot compare strings, so compare (bytes32) hashed encoded ones
-- do static analysis eg Slither / Mythril
 - get auto-gen'g DOCs site
 - set habit of reading rekt & audit reports
 - test order: unit tests, test cov'ge, fuzz, static
-- aim: readability ... in turn, improved maintainability
-- Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
+- testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
+- cannot compare strings, so compare (bytes32) hashed encoded ones
+- test functions += modifiers (to modularize)
+- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
+- do static analysis eg Slither / Mythril
 - note: DoD: high quality
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract
