@@ -44,6 +44,9 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~code functions for incorporating price~~
 - ~~compare new functions to functions of previous version~~
 - ~~only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name~~
+- ~~Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.~~
+- ~~Comment the "why" as much as possible.~~
+- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
 - for mathy bits: multiply before divide
 - secure 'selfdestruct'
@@ -53,15 +56,12 @@ Rebuild two repositories into this one, tracked via the following...
 - test functions += modifiers (to modularize)
 - maybe use a MAKE file
 - cannot compare strings, so compare (bytes32) hashed encoded ones
-- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - do static analysis eg Slither / Mythril
 - get auto-gen'g DOCs site
 - set habit of reading rekt & audit reports
 - test order: unit tests, test cov'ge, fuzz, static
 - aim: readability ... in turn, improved maintainability
 - Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
-- Comment the "why" as much as possible.
-- Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.
 - note: DoD: high quality
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract

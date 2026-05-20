@@ -10,8 +10,8 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 /**
  * @title ROColor
  * @author Merrill B. Lamont III (rockopera.eth)
- * @notice Own a color. Name that color. Make art onchain.
- * @dev Onchain art tech for onchain art work: 1 NFT color swatch for each of the 16M+ web colors.
+ * @notice Tokenizes the 16M+ web colors into nameable, collectible, and usable native-onchain assets
+ * @dev ERC721 NFT contract is intended to compose with similar native-onchain art tech, resulting in fully-onchain artwork
  */
 contract Rocolor is ERC721, Ownable {
     /****
@@ -261,7 +261,7 @@ contract Rocolor is ERC721, Ownable {
     // TODO: learn & use bit operations i/o arithmatic
     // TODO: get function title to have lowest selector number, so less run-t gas in finding it
     /**
-     * @notice Converts a hexadecimal number into its decimal representation
+     * @notice Converts a hexadecimal number into its decimal representation: a human-friendly color identifier to a contract-friendly one
      * @dev Constructs decimal number as the sum of the appropriately bit-shifted bit-values of each hexadecimal numeral
      * @dev Reverts if input is not exactly 6 bytes
      * @dev Reverts if an input byte is not a hexadecimal numeral
@@ -291,7 +291,7 @@ contract Rocolor is ERC721, Ownable {
     }
 
     /**
-     * @notice Converts a decimal number into its hexadecimal representation
+     * @notice Converts a decimal number into its hexadecimal representation: a contract-friendly color identifier to a human-friendly one
      * @dev Constructs hex triplet's bytes, right-to-left, with decimal's mod-16 value, then right-bit-shifting the decimal by 1 byte
      * @dev Reverts if input is 2^24 or greater
      * @param decimal A positive decimal integer, likely a ROColor's tokenId
@@ -311,7 +311,7 @@ contract Rocolor is ERC721, Ownable {
     }
 
     /**
-     * @notice Gets the tokenURI, with SVG picture, of a ROColor token
+     * @notice Gets the tokenURI of a ROColor token: the picture and other metadata
      * @dev Constructs, packs, and Base64-encodes the metadata associated with a tokenId
      * @dev Reverts if input is 2^24 or greater
      * @param tokenId Token ID of the ROColor
@@ -449,7 +449,7 @@ contract Rocolor is ERC721, Ownable {
     }
 
     /**
-     * @notice Allows only the owner of a ROColor token to continue
+     * @notice Allows only the owner of a ROColor token to continue: access-control for certain actions
      * @dev No input validations beyond ERC721 base contract token-owner-getting validations
      * @dev Reverts if token is not currently owned/minted
      * @dev Reverts if token is owned by someone else
