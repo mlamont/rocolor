@@ -50,7 +50,8 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)~~
 - ~~Use the delete keyword when setting a variable to a zero value (0, false, "", etc).~~
 - ~~secure 'selfdestruct'~~
-- aim: readability ... in turn, improved maintainability
+- ~~aim: readability ... in turn, improved maintainability~~
+- prioritize TODOs in the code
 - DOC steps to code this PRJ for a newb
 - test order: unit tests, test cov'ge, fuzz, static
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug

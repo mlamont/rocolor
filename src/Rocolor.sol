@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.33;
 
-// TODO install depedencies before import
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
@@ -18,11 +17,8 @@ contract Rocolor is ERC721, Ownable {
     ***** STATE VARIABLES
     ****/
 
-    // think about options 4 constants & immutables & state variables, & capital'z'g
-    // Only use private to intentionally prevent child contracts from
-    // ...accessing the variable, prefer internal for flexibility.
-    // Is calculating a value on the fly cheaper than storing it?
-    mapping(uint256 tokenId => string) internal _colorNames; // TODO include "tokenId"? internal i/o private?
+    // TODO include "tokenId"?
+    mapping(uint256 tokenId => string) internal _colorNames;
 
     uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
@@ -40,9 +36,6 @@ contract Rocolor is ERC721, Ownable {
     ***** EVENTS
     ****/
 
-    // TODO emit when storage variable updated ("nounVerbed")
-    // TODO go for cohesive naming
-
     event ROColor__DepositReceived(address indexed sender, uint256 indexed amount);
     event ROColor__Rename(string indexed from, string indexed to, uint256 indexed tokenId);
     event ROColor__ContractBalanceWithdrawalPassed(uint256 indexed contractBalance);
@@ -51,7 +44,6 @@ contract Rocolor is ERC721, Ownable {
     ***** ERRORS
     ****/
 
-    // TODO go for cohesive naming ("nounAdj")
     error ROColor__TokenIdTooBig(uint256 tokenId);
     error ROColor__HexTripletLengthInvalid(string hexTriplet);
     error ROColor__HexTripletNumeralInvalid(bytes1 numeral);
@@ -61,20 +53,11 @@ contract Rocolor is ERC721, Ownable {
     error ROColor__ContractBalanceEmpty();
 
     /****
-    ***** MODIFIERS
-    ****/
-
-    // for gas: wrap internal functions
-    // use to improve readability & decrease code duplication
-    // yes, use natspec
-
-    /****
     ***** CONSTRUCTOR
     ****/
 
-    constructor() ERC721("ROColor", "ROC") Ownable(_msgSender()) {
-        // starting stuff
-    }
+    // TODO nothing in here?
+    constructor() ERC721("ROColor", "ROC") Ownable(_msgSender()) {}
 
     /****
     ***** RECEIVE FUNCTION
@@ -104,9 +87,6 @@ contract Rocolor is ERC721, Ownable {
     ***** EXTERNAL FUNCTIONS
     ****/
 
-    // TODO add nonReentrant modifier to each
-    // ...REALLY?
-
     // TODO deep review of each line
     /**
      * @notice Withdraws all funds from the contract, only by the contract owner
@@ -123,7 +103,7 @@ contract Rocolor is ERC721, Ownable {
         (bool success,) = owner().call{value: balanceOfThisContract}("");
         if (!success) revert ROColor__ContractBalanceWithdrawalFailed();
         emit ROColor__ContractBalanceWithdrawalPassed(balanceOfThisContract);
-        if (balanceOfThisContract != 0) revert ROColor__ContractBalanceWithdrawalFailed();
+        if (address(this).balance != 0) revert ROColor__ContractBalanceWithdrawalFailed();
     }
 
     /**
@@ -254,9 +234,6 @@ contract Rocolor is ERC721, Ownable {
     /****
     ***** PUBLIC FUNCTIONS
     ****/
-
-    // change to external if can reduce the cognitive overhead for auditors
-    // ...b/c it reduces the number of possible contexts in which the function can be called
 
     // NOTE: this is the function to optimize the most: called all the time!
     // TODO rename 'a' to 'asciiNumber'? also, the casts seem awkward
@@ -461,57 +438,4 @@ contract Rocolor is ERC721, Ownable {
         address colorOwner = _requireOwned(tokenId);
         if (colorOwner != _msgSender()) revert ERC721IncorrectOwner(_msgSender(), tokenId, colorOwner);
     }
-
-    /****
-    ***** PRIVATE FUNCTIONS
-    ****/
-
-    // Only use private to intentionally prevent child contracts from
-    // ...calling the function, prefer internal for flexibility.
-
-    // within each: view & pure f'n.s last
 }
-
-// code outline of newer version
-/* mapping(uint256 => string) internal _colorNames; */
-/*                                               _allowOnlyColorOwner(tokenId) */
-/* receive() */
-/* fallback() */
-/* withdraw() */
-/* mintColor(hexTriplet, colorName)              _mintColor(tokenId, colorName) */
-/* burnColor(hexTriplet)                         _burnColor(tokenId) */
-/* getColorOwner(hexTriplet)                     _getColorOwner(tokenId) */
-/* changeColorOwner(hexTriplet, newColorOwner)   _changeColorOwner(tokenId, newColorOwner) */
-/* getColorName(hexTriplet)                      _getColorName(tokenId) */
-/* changeColorName(hexTriplet, newColorName)     _changeColorName(tokenId, newColorName) */
-/* convertDecimalToHexTriplet(decimal) */
-/* convertHexTripletToDecimal(hexTriplet) */
-/* tokenURI() */
-// ... TODO: NAMING: name functions like this: [verb: mint/burn, get/change]Color[aspect: owner/name], which'll always take a 'hexTriplet' param
-// ... TODO: SCOPE: only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name
-// ... TODO: DOC: put in NatSpec: where internal functions are unchecked (checks are in the external functions), beyond what ERC721 does
-// ... TODO: SECURITY: CEI-PI / fn
-
-// code outline of older version
-// mapping(uint => string) private _names; // should be internal
-// bytes16 private constant _HEX_SYMBOLS = "0123456789ZBCDEF"; // do internal
-// uint private constant _MINT_PRICE = 0.001 ether; // do internal
-// setToken(colorhex, name) -     _setToken(tokenId, name)
-// nixToken(colorhex) -           _nixToken(tokenId)
-// getOwner(colorhex) -           _getOwner(tokenId)
-// modOwner(colorhex, newOwner) - _modOwner(tokenId, newOwner)
-// getName(colorhex) -            _getName(tokenId)
-// modName(colorhex, newName) -   _modName(tokenId, newName)
-// modifier: onlyTokenOwner(tokenId)
-// aGetId(colorhex)
-// getColorhex(n)
-// tokenURI()
-
-// commenting pre-function, start w/ natspec:
-// @notice explains to a user starting w/ present tense verb
-// @dev explains to a developer, incl. requirements, important, warning, "emits an XYZ event", "reverts if..."
-// @param
-// @return
-//
-// commenting mid-function:
-// notable subtitles within an important f'n
