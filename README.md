@@ -46,16 +46,12 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~only 1 task per 1 function, so embrace the smaller scope of activity, reflected in function name~~
 - ~~Summarize the purpose and functionality of the contract with a @notice natspec comment. Document how the contract interacts with other contracts inside/outside the project in a @dev natspec comment.~~
 - ~~Comment the "why" as much as possible.~~
-- for mathy bits: multiply before divide
-- CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)
-- Use the delete keyword when setting a variable to a zero value (0, false, "", etc).
-- secure 'selfdestruct'
+- ~~for mathy bits: multiply before divide~~
+- ~~CEI (Checks, Effects, Interactions) + PI (Protocol Invariants)~~
+- ~~Use the delete keyword when setting a variable to a zero value (0, false, "", etc).~~
+- ~~secure 'selfdestruct'~~
 - aim: readability ... in turn, improved maintainability
 - DOC steps to code this PRJ for a newb
-- set & use Helper.Config.s.sol for NetworkConfig for deploy script
-- maybe use a MAKE file
-- get auto-gen'g DOCs site
-- set habit of reading rekt & audit reports
 - test order: unit tests, test cov'ge, fuzz, static
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
 - cannot compare strings, so compare (bytes32) hashed encoded ones
@@ -63,6 +59,10 @@ Rebuild two repositories into this one, tracked via the following...
 - FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - do static analysis eg Slither / Mythril
 - note: DoD: high quality
+- set & use Helper.Config.s.sol for NetworkConfig for deploy script
+- maybe use a MAKE file
+- get auto-gen'g DOCs site
+- set habit of reading rekt & audit reports
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract
 
