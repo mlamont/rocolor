@@ -5,6 +5,7 @@ pragma solidity 0.8.33;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title ROColor
@@ -12,7 +13,7 @@ import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
  * @notice Tokenizes the 16M+ web colors into nameable, collectible, and usable native-onchain assets
  * @dev ERC721 NFT contract is intended to compose with similar native-onchain art tech, resulting in fully-onchain artwork
  */
-contract Rocolor is ERC721, Ownable {
+contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     /****
     ***** STATE VARIABLES
     ****/
@@ -87,7 +88,7 @@ contract Rocolor is ERC721, Ownable {
     ***** EXTERNAL FUNCTIONS
     ****/
 
-    // TODO deep review of each line, and put a REENTRANCY guard here
+    // DONE deep review of each line, and put a REENTRANCY guard here
     /**
      * @notice Withdraws all funds from the contract, only by the contract owner
      * @dev Reverts if contract is owned by someone else
@@ -95,7 +96,7 @@ contract Rocolor is ERC721, Ownable {
      * @dev Reverts if fund withdrawal failed
      * @dev Emits a ROColor__ContractBalanceWithdrawalPassed event
      */
-    function withdraw() external onlyOwner {
+    function withdraw() external onlyOwner nonReentrant {
         // gotta ensure the checks-effects-interactions pattern is always in here
         uint256 balanceOfThisContract = address(this).balance;
         if (balanceOfThisContract == 0) revert ROColor__ContractBalanceEmpty();
@@ -120,7 +121,7 @@ contract Rocolor is ERC721, Ownable {
      * @param hexTriplet Hex triplet of the ROColor
      * @param colorName Name of the ROColor
      */
-    function mintColor(string calldata hexTriplet, string calldata colorName) external payable {
+    function mintColor(string calldata hexTriplet, string calldata colorName) external payable nonReentrant {
         if (bytes(colorName).length > COLOR_NAME_MAX_LENGTH) revert ROColor__ColorNameTooBig(colorName); // cheap checks first
         uint256 tokenId = convertHexTripletToDecimal(hexTriplet);
         if (tokenId > TOKEN_ID_MAX) revert ROColor__TokenIdTooBig(tokenId);
@@ -237,7 +238,7 @@ contract Rocolor is ERC721, Ownable {
     // NOTE: this is the function to optimize the most: called all the time!
     // DONE rename 'a' to 'asciiNumber'? also, the casts seem awkward
     // DONE: learn & use bit operations i/o arithmatic
-    // TODO: get function title to have lowest selector number, so less run-t gas in finding it
+    // DONE: get function title to have lowest selector number, so less run-t gas in finding it
     /**
      * @notice Converts a hexadecimal number into its decimal representation: a human-friendly color identifier to a contract-friendly one
      * @dev Constructs decimal number as the sum of the appropriately bit-shifted bit-values of each hexadecimal numeral
@@ -319,7 +320,7 @@ contract Rocolor is ERC721, Ownable {
 
     // DONE make this payable?
     // DONE: learn & use: bit operations & bitmaps to reduce comparisons, and punt price check to end
-    // TODO: investigate WARNING: minting is a source of reentrancy: it calls IERC721Receiver().onERC721received(): YES! put a reentrancy guard here
+    // DONE: investigate WARNING: minting is a source of reentrancy: it calls IERC721Receiver(to).onERC721received(): YES! put a reentrancy guard in the external version
     /**
      * @notice Creates a ROColor named color token
      * @dev No input validations beyond ERC721 base contract token-minting validations
