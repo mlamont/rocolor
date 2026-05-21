@@ -398,11 +398,11 @@ contract Rocolor is ERC721, Ownable {
         colorOwner = ownerOf(tokenId);
     }
 
-    // TODO comment to include color names w/ tokenIds
-    // TODO learn & use: bit operations & bitmaps to reduce comparisons
-    // TODO if & elseif instead of 2 separate ifs
-    // TODO investigate if can say token IS IN {255, 65280, ...}
-    // TODO consider unchecked {}
+    // DONE comment to include color names w/ tokenIds
+    // DONE learn & use: bit operations & bitmaps to reduce comparisons
+    // DONE if & elseif instead of 2 separate ifs
+    // DONE investigate if can say token IS IN {255, 65280, ...}
+    // DONE consider unchecked {}
     /**
      * @notice Gets the price of a ROColor token
      * @dev Constructs price as the product of a minimum and a factor representing pricing tiers
@@ -410,18 +410,16 @@ contract Rocolor is ERC721, Ownable {
      * @return colorPrice Price of the ROColor
      */
     function _getColorPrice(uint256 tokenId) internal pure returns (uint256 colorPrice) {
+        // 0.001 ETH for all web colors, unless it's the below
         uint256 colorPriceMultiplier = 1;
-
-        // if tokenId if the biggies, then multiplier is biggest
         if (tokenId == 0 || tokenId == TOKEN_ID_MAX) {
+            // 10 ETH for black, white
             colorPriceMultiplier = 10000;
-        }
-
-        // if tokenId is the middies, then multiplier is middest
-        if (
+        } else if (
             tokenId == 255 || tokenId == 65280 || tokenId == 16711680 || tokenId == 65535 || tokenId == 16711935
                 || tokenId == 16776960
         ) {
+            // 1 ETH for blue, green, red, cyan, magenta, yellow
             colorPriceMultiplier = 1000;
         }
         colorPrice = COLOR_PRICE_MIN * colorPriceMultiplier;
