@@ -4,7 +4,7 @@ pragma solidity 0.8.33;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Base64.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
 /**
  * @title ROColor
@@ -17,8 +17,8 @@ contract Rocolor is ERC721, Ownable {
     ***** STATE VARIABLES
     ****/
 
-    // TODO include "tokenId"?
-    mapping(uint256 tokenId => string) internal _colorNames;
+    // DONE include "tokenId"?
+    mapping(uint256 tokenId => string colorName) internal _colorNames;
 
     uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
@@ -56,7 +56,7 @@ contract Rocolor is ERC721, Ownable {
     ***** CONSTRUCTOR
     ****/
 
-    // TODO nothing in here?
+    // DONE nothing in here?
     constructor() ERC721("ROColor", "ROC") Ownable(_msgSender()) {}
 
     /****
@@ -87,7 +87,7 @@ contract Rocolor is ERC721, Ownable {
     ***** EXTERNAL FUNCTIONS
     ****/
 
-    // TODO deep review of each line
+    // TODO deep review of each line, and put a REENTRANCY guard here
     /**
      * @notice Withdraws all funds from the contract, only by the contract owner
      * @dev Reverts if contract is owned by someone else
@@ -99,8 +99,7 @@ contract Rocolor is ERC721, Ownable {
         // gotta ensure the checks-effects-interactions pattern is always in here
         uint256 balanceOfThisContract = address(this).balance;
         if (balanceOfThisContract == 0) revert ROColor__ContractBalanceEmpty();
-        // call() doesn't require owner() wrapped in payable()
-        (bool success,) = owner().call{value: balanceOfThisContract}("");
+        (bool success,) = payable(owner()).call{value: balanceOfThisContract}("");
         if (!success) revert ROColor__ContractBalanceWithdrawalFailed();
         emit ROColor__ContractBalanceWithdrawalPassed(balanceOfThisContract);
         if (address(this).balance != 0) revert ROColor__ContractBalanceWithdrawalFailed();
@@ -236,8 +235,8 @@ contract Rocolor is ERC721, Ownable {
     ****/
 
     // NOTE: this is the function to optimize the most: called all the time!
-    // TODO rename 'a' to 'asciiNumber'? also, the casts seem awkward
-    // TODO: learn & use bit operations i/o arithmatic
+    // DONE rename 'a' to 'asciiNumber'? also, the casts seem awkward
+    // DONE: learn & use bit operations i/o arithmatic
     // TODO: get function title to have lowest selector number, so less run-t gas in finding it
     /**
      * @notice Converts a hexadecimal number into its decimal representation: a human-friendly color identifier to a contract-friendly one
@@ -251,18 +250,18 @@ contract Rocolor is ERC721, Ownable {
         bytes calldata hexTripletBytes = bytes(hexTriplet);
         if (hexTripletBytes.length != HEX_TRIPLET_VALID_LENGTH) revert ROColor__HexTripletLengthInvalid(hexTriplet);
         for (uint256 i; i < HEX_TRIPLET_VALID_LENGTH;) {
-            bytes1 hexTripletByte = hexTripletBytes[(HEX_TRIPLET_VALID_LENGTH - 1) - i];
-            uint256 a = uint8(hexTripletByte);
+            bytes1 asciiHex = hexTripletBytes[(HEX_TRIPLET_VALID_LENGTH - 1) - i];
+            uint256 asciiDecimal = uint8(asciiHex);
             unchecked {
                 // ASCII ranges: 0-9 (48-57), A-F (65-70), a-f (97-102)
-                if (a > 47 && a < 58) {
-                    decimal += (a - 48) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
-                } else if (a > 64 && a < 71) {
-                    decimal += (a - 55) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
-                } else if (a > 96 && a < 103) {
-                    decimal += (a - 87) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
+                if (asciiDecimal > 47 && asciiDecimal < 58) {
+                    decimal += (asciiDecimal - 48) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
+                } else if (asciiDecimal > 64 && asciiDecimal < 71) {
+                    decimal += (asciiDecimal - 55) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
+                } else if (asciiDecimal > 96 && asciiDecimal < 103) {
+                    decimal += (asciiDecimal - 87) << (NUMBER_OF_BITS_IN_A_HEXADECIMAL * i);
                 } else {
-                    revert ROColor__HexTripletNumeralInvalid(hexTripletByte);
+                    revert ROColor__HexTripletNumeralInvalid(asciiHex);
                 }
                 ++i;
             }
@@ -318,9 +317,9 @@ contract Rocolor is ERC721, Ownable {
     ***** INTERNAL FUNCTIONS
     ****/
 
-    // TODO make this payable?
-    // TODO: learn & use: bit operations & bitmaps to reduce comparisons, and punt price check to end
-    // TODO: investigate WARNING: minting is a source of reentrancy: it calls IERC721Receiver().onERC721received()
+    // DONE make this payable?
+    // DONE: learn & use: bit operations & bitmaps to reduce comparisons, and punt price check to end
+    // TODO: investigate WARNING: minting is a source of reentrancy: it calls IERC721Receiver().onERC721received(): YES! put a reentrancy guard here
     /**
      * @notice Creates a ROColor named color token
      * @dev No input validations beyond ERC721 base contract token-minting validations
@@ -416,8 +415,8 @@ contract Rocolor is ERC721, Ownable {
             // 10 ETH for black, white
             colorPriceMultiplier = 10000;
         } else if (
-            tokenId == 255 || tokenId == 65280 || tokenId == 16711680 || tokenId == 65535 || tokenId == 16711935
-                || tokenId == 16776960
+            tokenId == 0x0000FF || tokenId == 0x00FF00 || tokenId == 0xFF0000 || tokenId == 0x00FFFF
+                || tokenId == 0xFF00FF || tokenId == 0xFFFF00
         ) {
             // 1 ETH for blue, green, red, cyan, magenta, yellow
             colorPriceMultiplier = 1000;
