@@ -16,7 +16,7 @@ forge --version
 forge init
 ```
 
-I was hoping for a forge version of `1.5.1-stable`, which I got, and now I have a project in that `rocolor` folder.
+I was hoping for a Forge version of `1.5.1-stable`, which I got because I installed Foundry recently, and now I have a project in that `rocolor` folder.
 
 Opening this folder in VS Code, the 'Source Control' tab on the left was where I could start a 'rocolor' repository, and then publish (private) to GitHub, an account for which I had already set up and connected to VS Code via a GH extension.
 
@@ -31,3 +31,13 @@ Code a `.sol` file in the `src` folder, and type in the terminal `forge build` t
 I started with simple `setName()` and `getName()` functions.
 
 ### Deploy Locally
+
+Foundry is a great toolchain for Solidity smart contract development! Run the `anvil` command, and you get a local blockchain started up, it's RPC URL, and 10 funded accounts with their private keys.
+
+Open up a terminal that's separate from VS Code for this next command:
+
+```
+cast wallet import anvil0 --interactive
+```
+
+When prompted, enter the private key of Anvil's Account #0, and then a password to access this account. While this is overkill for using fake funds on a local blockchain, this process of setting up and accessing a keystore encrypted account, like "anvil0" here, is practicing a more secure process (than storing a private key as plain text in a `.env` file) I repeated for using real funds, for later deploying to a public testnet (and beyond!).
