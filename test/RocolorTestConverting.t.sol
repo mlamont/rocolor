@@ -6,7 +6,7 @@ import {Test, console} from "lib/forge-std/src/Test.sol";
 import {Rocolor} from "src/Rocolor.sol";
 import {DeployRocolor} from "script/DeployRocolor.s.sol";
 
-contract RocolorTest is Test, Rocolor {
+contract RocolorTestConverting is Test, Rocolor {
     Rocolor rocolor;
     DeployRocolor deployer;
     string colorhex;
@@ -127,7 +127,7 @@ contract RocolorTest is Test, Rocolor {
 
         // case: too big
         decimal = WHITE_DECIMAL + 1;
-        vm.expectPartialRevert(ROColor__DecimalTooBig.selector);
+        vm.expectPartialRevert(ROColor__TokenIdTooBig.selector);
         colorhex = rocolor.convertDecimalToHexTriplet(decimal);
         console.log("reverted too big");
 
