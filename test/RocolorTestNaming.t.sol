@@ -11,26 +11,33 @@ contract RocolorTestConverting is Test, Rocolor {
     DeployRocolor deployer;
     string hexTriplet;
     uint256 tokenId;
+    address HERO = makeAddr("hero");
+    address VILLAIN = makeAddr("villain");
     uint256 constant MURPH_LIGHT_TOKEN_ID = 12695456;
     string constant MURPH_LIGHT_HEX_TRIPLET = "C1B7A0";
+    string constant MURPH_LIGHT_COLOR_NAME = "Murph Light";
+    string constant SUPER_BORING_COLOR_NAME = "Super Boring";
     uint256 constant WHITE_TOKEN_ID = 16777215;
     uint256 constant BLACK_TOKEN_ID = 0;
 
     function setUp() public {
         deployer = new DeployRocolor();
         rocolor = deployer.run();
-        // gotta prank a token already being minted & named
+        vm.prank(HERO);
+        rocolor.mintColor(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
     }
 
     function testChangeColorName_HappyPath() public {
         // Arrange
-        // colorhex = "C1B7A0";
+        // already done via setUp() and with constant strings
 
         // Act
-        // decimal = rocolor.convertHexTripletToDecimal(colorhex);
+        vm.prank(HERO);
+        rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
 
         // Assert
-        // assertEq(decimal, MURPH_LIGHT_DECIMAL);
+        string memory inside = ""; // get the contents of the memory slot
+        assertEq(inside, SUPER_BORING_COLOR_NAME);
     }
 }
 
