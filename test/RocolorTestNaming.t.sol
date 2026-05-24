@@ -5,7 +5,7 @@ pragma solidity 0.8.33;
 import {Test, console} from "lib/forge-std/src/Test.sol";
 import {Rocolor} from "src/Rocolor.sol";
 import {DeployRocolor} from "script/DeployRocolor.s.sol";
-import {StorageSlot} from "@openzeppelin/contracts/utils/StorageSlot.sol";
+// import {StorageSlot} from "@openzeppelin/contracts/utils/StorageSlot.sol";
 
 contract RocolorTestConverting is Test, Rocolor {
     Rocolor rocolor;
@@ -31,11 +31,12 @@ contract RocolorTestConverting is Test, Rocolor {
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
     }
 
-    function getMappingSlot(uint256 _key, uint256 _baseSlot) public pure returns (bytes32) {
-        bytes32 mappingSlot = keccak256(abi.encode(_key, _baseSlot));
-        string memory printableMappingSlot = vm.toString(mappingSlot);
-        console.log("mappingSlot is:", printableMappingSlot);
-        return mappingSlot;
+    function getMappingValueStorageSlot(uint256 mappingKey, uint256 mappingVariableStorageSlot)
+        public
+        pure
+        returns (bytes32 mappingValueStorageSlot)
+    {
+        mappingValueStorageSlot = keccak256(abi.encode(mappingKey, mappingVariableStorageSlot));
     }
 
     function convertStorageStringToNameString(bytes32 storageString) public pure returns (string memory nameString) {
@@ -56,13 +57,14 @@ contract RocolorTestConverting is Test, Rocolor {
         vm.prank(HERO);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
         //// Assert
-        // get the slot
-        bytes32 mappingSlot = getMappingSlot(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
-        // get the value
-        bytes32 mappingSlotValue = vm.load(address(rocolor), mappingSlot);
-        // get the name
-        string memory nameString = convertStorageStringToNameString(mappingSlotValue);
-        // compare value
+        // get the storage slot of the colorName
+        bytes32 mappingValueStorageSlot =
+            getMappingValueStorageSlot(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        // get the value in that storage slot
+        bytes32 storageString = vm.load(address(rocolor), mappingValueStorageSlot);
+        // get the colorName from that storage slot's value
+        string memory nameString = convertStorageStringToNameString(storageString);
+        // compare output with input
         assertEq(nameString, SUPER_BORING_COLOR_NAME);
     }
 }
