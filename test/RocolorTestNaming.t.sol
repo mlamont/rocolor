@@ -5,6 +5,7 @@ pragma solidity 0.8.33;
 import {Test, console} from "lib/forge-std/src/Test.sol";
 import {Rocolor} from "src/Rocolor.sol";
 import {DeployRocolor} from "script/DeployRocolor.s.sol";
+import {StorageSlot} from "@openzeppelin/contracts/utils/StorageSlot.sol";
 
 contract RocolorTestConverting is Test, Rocolor {
     Rocolor rocolor;
@@ -15,29 +16,54 @@ contract RocolorTestConverting is Test, Rocolor {
     address VILLAIN = makeAddr("villain");
     uint256 constant MURPH_LIGHT_TOKEN_ID = 12695456;
     string constant MURPH_LIGHT_HEX_TRIPLET = "C1B7A0";
-    string constant MURPH_LIGHT_COLOR_NAME = "Murph Light";
+    string constant MURPH_LIGHT_COLOR_NAME = "MurphLight";
     string constant SUPER_BORING_COLOR_NAME = "Super Boring";
     uint256 constant WHITE_TOKEN_ID = 16777215;
     uint256 constant BLACK_TOKEN_ID = 0;
+    uint256 constant OWNERS_MAPPING_BASE_SLOT = 2;
+    uint256 constant COLOR_NAMES_MAPPING_BASE_SLOT = 7;
 
     function setUp() public {
         deployer = new DeployRocolor();
         rocolor = deployer.run();
+        vm.deal(HERO, 10 ether);
         vm.prank(HERO);
-        rocolor.mintColor(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+    }
+
+    function getMappingSlot(uint256 _key, uint256 _baseSlot) public pure returns (bytes32) {
+        bytes32 mappingSlot = keccak256(abi.encode(_key, _baseSlot));
+        string memory printableMappingSlot = vm.toString(mappingSlot);
+        console.log("mappingSlot is:", printableMappingSlot);
+        return mappingSlot;
+    }
+
+    function convertStorageStringToNameString(bytes32 storageString) public pure returns (string memory nameString) {
+        bytes memory storageStringBytes = abi.encode(storageString);
+        uint256 sizeByte = uint8(storageStringBytes[31]);
+        require(sizeByte % 2 == 0, "storage string too long");
+        bytes memory nameStringBytes = new bytes(sizeByte / 2);
+        for (uint256 i = 0; i < (sizeByte / 2); i++) {
+            nameStringBytes[i] = storageStringBytes[i];
+        }
+        nameString = string(nameStringBytes);
     }
 
     function testChangeColorName_HappyPath() public {
-        // Arrange
+        //// Arrange
         // already done via setUp() and with constant strings
-
-        // Act
+        //// Act
         vm.prank(HERO);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
-
-        // Assert
-        string memory inside = ""; // get the contents of the memory slot
-        assertEq(inside, SUPER_BORING_COLOR_NAME);
+        //// Assert
+        // get the slot
+        bytes32 mappingSlot = getMappingSlot(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        // get the value
+        bytes32 mappingSlotValue = vm.load(address(rocolor), mappingSlot);
+        // get the name
+        string memory nameString = convertStorageStringToNameString(mappingSlotValue);
+        // compare value
+        assertEq(nameString, SUPER_BORING_COLOR_NAME);
     }
 }
 

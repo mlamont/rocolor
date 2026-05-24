@@ -23,7 +23,7 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
 
     uint256 private constant TOKEN_ID_MAX = 16777215;
     uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
-    uint256 private constant COLOR_NAME_MAX_LENGTH = 32;
+    uint256 private constant COLOR_NAME_MAX_LENGTH = 31;
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
     uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
     uint256 private constant COLOR_PRICE_MIN = 0.001 ether;
