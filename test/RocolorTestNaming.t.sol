@@ -81,7 +81,7 @@ contract RocolorTestConverting is Test, Rocolor {
         assertEq(colorNameFromStorage, SUPER_BORING_COLOR_NAME);
     }
 
-    function testChangeColorName_Length() public {
+    function testChangeColorName_NameLength() public {
         string memory colorNameFromStorage;
 
         // case: 32 fails
@@ -118,6 +118,181 @@ contract RocolorTestConverting is Test, Rocolor {
         colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, "a");
     }
+
+    function testChangeColorName_HexLength() public {
+        string memory colorNameFromStorage;
+
+        // case: length == 0
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("", SUPER_BORING_COLOR_NAME);
+
+        // case: length == 1
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C", SUPER_BORING_COLOR_NAME);
+
+        // case: length == 5
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7A", SUPER_BORING_COLOR_NAME);
+
+        // case: length == 6
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7A0", SUPER_BORING_COLOR_NAME);
+        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, SUPER_BORING_COLOR_NAME);
+
+        // case: length == 7
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7A02", SUPER_BORING_COLOR_NAME);
+    }
+
+    function testChangeColorName_HexNumeral() public {
+        // case: bad char is first
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("G1B7A0", SUPER_BORING_COLOR_NAME);
+
+        // case: bad char is middle
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1G7A0", SUPER_BORING_COLOR_NAME);
+
+        // case: bad char is last
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7AG", SUPER_BORING_COLOR_NAME);
+
+        // case: bad char is "*"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7*0", SUPER_BORING_COLOR_NAME);
+
+        // case: bad char is a space
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7 0", SUPER_BORING_COLOR_NAME);
+
+        // case: bad char is ";"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1B7;0", SUPER_BORING_COLOR_NAME);
+
+        // case: bad chars are "\\"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("C1\\7A0", SUPER_BORING_COLOR_NAME);
+    }
+
+    function testChangeColorName_Ownership() public {
+        // not minted
+        vm.expectPartialRevert(ERC721NonexistentToken.selector);
+        vm.prank(HERO);
+        rocolor.changeColorName("000000", SUPER_BORING_COLOR_NAME);
+
+        // owned by somebody else
+        vm.expectPartialRevert(ERC721IncorrectOwner.selector);
+        vm.prank(VILLAIN);
+        rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
+    }
+
+    function testGetColorName_HappyPath() public {
+        string memory colorNameFromFunction;
+        string memory colorNameFromStorage;
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName(MURPH_LIGHT_HEX_TRIPLET);
+        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, colorNameFromFunction);
+    }
+
+    function testGetColorName_HexLength() public {
+        string memory colorNameFromFunction;
+        string memory colorNameFromStorage;
+
+        // case: length == 0
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("");
+
+        // case: length == 1
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C");
+
+        // case: length == 5
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7A");
+
+        // case: length == 6
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7A0");
+        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, colorNameFromFunction);
+
+        // case: length == 7
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7A02");
+    }
+
+    function testGetColorName_HexNumeral() public {
+        string memory colorNameFromFunction;
+
+        // case: bad char is first
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("G1B7A0");
+
+        // case: bad char is middle
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1G7A0");
+
+        // case: bad char is last
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7AG");
+
+        // case: bad char is "*""
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7*0");
+
+        // case: bad char is a space
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7 0");
+
+        // case: bad char is ";"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1B7;0");
+
+        // case: bad chars are "\\"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("C1\\7A0");
+    }
+
+    function testGetColorName_Ownership() public {
+        string memory colorNameFromFunction;
+        string memory colorNameFromStorage;
+
+        // not minted
+        vm.prank(HERO);
+        colorNameFromFunction = rocolor.getColorName("000000");
+        colorNameFromStorage = getColorNameFromStorage(0, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, colorNameFromFunction);
+
+        // owned by somebody else
+        vm.prank(VILLAIN);
+        colorNameFromFunction = rocolor.getColorName(MURPH_LIGHT_HEX_TRIPLET);
+        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, colorNameFromFunction);
+    }
 }
 
 // notes:
@@ -127,11 +302,12 @@ contract RocolorTestConverting is Test, Rocolor {
 // backlog:
 // This is naming... changeColorName(hexTriplet, newColorName), getColorName(hexTriplet)
 // / happy path changing, and emits an event
-// / reverts if bad name: size
-// reverts if bad hex: length
-// reverts if bad hex: numeral
-// reverts if bad calc'd tokenId: size
-// reverts if token is not owned
-// reverts if token is owned by someone else
-// happy path getting
+// /x reverts if bad name: size
+// // reverts if bad hex: length
+// // reverts if bad hex: numeral
+// reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
+// // reverts if token is not owned
+// // reverts if token is owned by someone else
+// / happy path getting
 // above cases (most) for getting
+// TODO put 3 helper functions into own file, for use with other test suites
