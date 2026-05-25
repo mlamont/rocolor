@@ -44,18 +44,16 @@ contract RocolorTestHelpers is Test {
     }
 
     function convertStorageStringToColorOwnerAddress(bytes32 storageString) public pure returns (address ownerAddress) {
-        // bytes memory storageStringBytes = abi.encode(storageString);
-        // uint256 sizeByte = uint8(storageStringBytes[31]);
-        // require(sizeByte % 2 == 0, "storage string too long");
-        // bytes memory nameStringBytes = new bytes(sizeByte / 2);
-        // for (uint256 i = 0; i < (sizeByte / 2); i++) {
-        //     nameStringBytes[i] = storageStringBytes[i];
-        // }
+        bytes memory storageStringBytes = abi.encode(storageString);
+        bytes memory ownerAddressBytes = new bytes(20);
+        for (uint256 i = 0; i < 20; i++) {
+            ownerAddressBytes[i] = storageStringBytes[12 + i];
+        }
         // ownerAddress = string(nameStringBytes);
 
         // how are addresses stored in a storage slot?
         // ownerAddress = address(uint160(abi.encode(storageString)));
-        ownerAddress = vm.parseAddress(vm.toString(storageString));
+        ownerAddress = vm.parseAddress(vm.toString(ownerAddressBytes));
     }
 
     function getColorOwnerFromStorage(address rocolorContract, uint256 _tokenId, uint256 mappingVariableStorageSlot)
