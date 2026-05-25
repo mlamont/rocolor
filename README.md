@@ -53,7 +53,7 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~aim: readability ... in turn, improved maintainability~~
 - ~~prioritize TODOs in the code~~
 - ~~DOC steps to code this PRJ for a newb~~
-- unit tests: ~~converting, naming, owning,~~ pricing, minting, burning
+- unit tests: ~~converting, naming, owning, pricing,~~ minting, burning
 - unit tests: receiving, fallingback, tokenURI'g, withdrawing
 - test order: unit tests, test cov'ge, fuzz, static
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
