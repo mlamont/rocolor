@@ -222,6 +222,9 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     /**
      * @notice Gets the price of a ROColor token
      * @dev Converts hex triplet to tokenId, does checks, then passes to internal function
+     * @dev Reverts if hex triplet is not exactly 6 bytes
+     * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
+     * @dev Reverts if calculated tokenId is 2^24 or greater
      * @param hexTriplet Hex triplet of the ROColor
      * @return colorPrice Price of the ROColor
      */
