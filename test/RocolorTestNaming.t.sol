@@ -7,7 +7,7 @@ import {Rocolor} from "src/Rocolor.sol";
 import {DeployRocolor} from "script/DeployRocolor.s.sol";
 import {RocolorTestHelpers} from "./RocolorTestHelpers.sol";
 
-contract RocolorTestConverting is Test, Rocolor, RocolorTestHelpers {
+contract RocolorTestNaming is Test, Rocolor, RocolorTestHelpers {
     Rocolor rocolor;
     DeployRocolor deployer;
     string hexTriplet;
