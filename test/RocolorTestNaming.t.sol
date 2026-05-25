@@ -74,6 +74,8 @@ contract RocolorTestNaming is Test, Rocolor, RocolorTestHelpers {
         // already done via setUp() and with constant strings
         //// Act
         vm.prank(HERO);
+        vm.expectEmit();
+        emit ROColor__Rename(MURPH_LIGHT_COLOR_NAME, SUPER_BORING_COLOR_NAME, MURPH_LIGHT_TOKEN_ID);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
         //// Assert
         string memory colorNameFromStorage =

@@ -112,7 +112,7 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
-     * @dev Reverts if name length is over 32 bytes
+     * @dev Reverts if name length is over 31 bytes
      * @dev Reverts if funds are less than the price of the color token
      * @dev Reverts if minting to the burn address
      * @dev Reverts if token already exists
@@ -135,7 +135,7 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
      * @dev Reverts if hex triplet is not exactly 6 bytes
      * @dev Reverts if a hex triplet byte is not a hexadecimal numeral
      * @dev Reverts if calculated tokenId is 2^24 or greater
-     * @dev Reverts if name length is over 32 bytes
+     * @dev Reverts if name length is over 31 bytes
      * @dev Reverts if token is not currently owned/minted
      * @dev Reverts if token is owned by someone else
      * @dev Emits a ROColor__Rename event

@@ -31,6 +31,20 @@ contract RocolorTestOwning is Test, Rocolor, RocolorTestHelpers {
         vm.prank(HERO);
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
     }
+
+    function testChangeColorOwner_HappyPath() public {
+        //// Arrange
+        // already done via setUp() and with constant strings
+        //// Act
+        vm.prank(HERO);
+        vm.expectEmit();
+        emit Transfer(HERO, FRIEND, MURPH_LIGHT_TOKEN_ID);
+        rocolor.changeColorOwner(MURPH_LIGHT_HEX_TRIPLET, FRIEND);
+        //// Assert
+        address colorOwnerFromStorage =
+            getColorOwnerFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, OWNERS_MAPPING_BASE_SLOT);
+        assertEq(colorOwnerFromStorage, FRIEND);
+    }
 }
 
 // notes:
@@ -39,8 +53,17 @@ contract RocolorTestOwning is Test, Rocolor, RocolorTestHelpers {
 
 // backlog:
 // happy path: change owner
-// TODO: go thru code
-// TODO: go thru natspec
-// TODO: go thru existing test docs for comparable cases
+// emits: transfer
+// reverts: hex length: not 6 (0, 1, 5, 6, 7)
+// reverts: hex member: not 0-F (first, ..., \\)
+// reverts: new owner: invalid (too long, too short)
+// reverts: new owner: burn
+// reverts: owner: none (not minted)
+// reverts: owner: somebody else (owned by somebody else)
 // happy path: get owner
+// reverts: hex length: not 6 (0, 1, 5, 6, 7)
+// reverts: hex member: not 0-F (first, ..., \\)
+// reverts: owner: none (not minted)
+// OK: owner: somebody else (owned by somebody else)
+
 // TODO (maybe?) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
