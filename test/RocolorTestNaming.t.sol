@@ -5,9 +5,9 @@ pragma solidity 0.8.33;
 import {Test, console} from "lib/forge-std/src/Test.sol";
 import {Rocolor} from "src/Rocolor.sol";
 import {DeployRocolor} from "script/DeployRocolor.s.sol";
-// import {StorageSlot} from "@openzeppelin/contracts/utils/StorageSlot.sol";
+import {RocolorTestHelpers} from "./RocolorTestHelpers.sol";
 
-contract RocolorTestConverting is Test, Rocolor {
+contract RocolorTestConverting is Test, Rocolor, RocolorTestHelpers {
     Rocolor rocolor;
     DeployRocolor deployer;
     string hexTriplet;
@@ -31,43 +31,43 @@ contract RocolorTestConverting is Test, Rocolor {
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
     }
 
-    function getMappingValueStorageSlot(uint256 mappingKey, uint256 mappingVariableStorageSlot)
-        public
-        pure
-        returns (bytes32 mappingValueStorageSlot)
-    {
-        mappingValueStorageSlot = keccak256(abi.encode(mappingKey, mappingVariableStorageSlot));
-    }
+    // function getMappingValueStorageSlot(uint256 mappingKey, uint256 mappingVariableStorageSlot)
+    //     public
+    //     pure
+    //     returns (bytes32 mappingValueStorageSlot)
+    // {
+    //     mappingValueStorageSlot = keccak256(abi.encode(mappingKey, mappingVariableStorageSlot));
+    // }
 
-    function convertStorageStringToColorNameString(bytes32 storageString)
-        public
-        pure
-        returns (string memory nameString)
-    {
-        bytes memory storageStringBytes = abi.encode(storageString);
-        uint256 sizeByte = uint8(storageStringBytes[31]);
-        require(sizeByte % 2 == 0, "storage string too long");
-        bytes memory nameStringBytes = new bytes(sizeByte / 2);
-        for (uint256 i = 0; i < (sizeByte / 2); i++) {
-            nameStringBytes[i] = storageStringBytes[i];
-        }
-        nameString = string(nameStringBytes);
-    }
+    // function convertStorageStringToColorNameString(bytes32 storageString)
+    //     public
+    //     pure
+    //     returns (string memory nameString)
+    // {
+    //     bytes memory storageStringBytes = abi.encode(storageString);
+    //     uint256 sizeByte = uint8(storageStringBytes[31]);
+    //     require(sizeByte % 2 == 0, "storage string too long");
+    //     bytes memory nameStringBytes = new bytes(sizeByte / 2);
+    //     for (uint256 i = 0; i < (sizeByte / 2); i++) {
+    //         nameStringBytes[i] = storageStringBytes[i];
+    //     }
+    //     nameString = string(nameStringBytes);
+    // }
 
-    function getColorNameFromStorage(uint256 _tokenId, uint256 mappingVariableStorageSlot)
-        public
-        view
-        returns (string memory colorName)
-    {
-        // get the storage slot of the colorName
-        bytes32 mappingValueStorageSlot = getMappingValueStorageSlot(_tokenId, mappingVariableStorageSlot);
+    // function getColorNameFromStorage(uint256 _tokenId, uint256 mappingVariableStorageSlot)
+    //     public
+    //     view
+    //     returns (string memory colorName)
+    // {
+    //     // get the storage slot of the colorName
+    //     bytes32 mappingValueStorageSlot = getMappingValueStorageSlot(_tokenId, mappingVariableStorageSlot);
 
-        // get the value in that storage slot
-        bytes32 storageValue = vm.load(address(rocolor), mappingValueStorageSlot);
+    //     // get the value in that storage slot
+    //     bytes32 storageValue = vm.load(address(rocolor), mappingValueStorageSlot);
 
-        // get the colorName from that storage slot's value
-        colorName = convertStorageStringToColorNameString(storageValue);
-    }
+    //     // get the colorName from that storage slot's value
+    //     colorName = convertStorageStringToColorNameString(storageValue);
+    // }
 
     function testChangeColorName_HappyPath() public {
         //// Arrange
@@ -77,7 +77,7 @@ contract RocolorTestConverting is Test, Rocolor {
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
         //// Assert
         string memory colorNameFromStorage =
-            getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, SUPER_BORING_COLOR_NAME);
     }
 
@@ -97,25 +97,29 @@ contract RocolorTestConverting is Test, Rocolor {
         // case: 31 passes
         vm.prank(HERO);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, "abcdefghijabcdefghijabcdefghij1");
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, "abcdefghijabcdefghijabcdefghij1");
 
         // case: 30 passes
         vm.prank(HERO);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, "abcdefghijabcdefghijabcdefghij");
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, "abcdefghijabcdefghijabcdefghij");
 
         // case: 0 passes
         vm.prank(HERO);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, "");
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, "");
 
         // case: 1 passes
         vm.prank(HERO);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, "a");
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, "a");
     }
 
@@ -140,7 +144,8 @@ contract RocolorTestConverting is Test, Rocolor {
         // case: length == 6
         vm.prank(HERO);
         rocolor.changeColorName("C1B7A0", SUPER_BORING_COLOR_NAME);
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, SUPER_BORING_COLOR_NAME);
 
         // case: length == 7
@@ -203,7 +208,8 @@ contract RocolorTestConverting is Test, Rocolor {
         string memory colorNameFromStorage;
         vm.prank(HERO);
         colorNameFromFunction = rocolor.getColorName(MURPH_LIGHT_HEX_TRIPLET);
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, colorNameFromFunction);
     }
 
@@ -229,7 +235,8 @@ contract RocolorTestConverting is Test, Rocolor {
         // case: length == 6
         vm.prank(HERO);
         colorNameFromFunction = rocolor.getColorName("C1B7A0");
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, colorNameFromFunction);
 
         // case: length == 7
@@ -284,13 +291,14 @@ contract RocolorTestConverting is Test, Rocolor {
         // not minted
         vm.prank(HERO);
         colorNameFromFunction = rocolor.getColorName("000000");
-        colorNameFromStorage = getColorNameFromStorage(0, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage = getColorNameFromStorage(address(rocolor), 0, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, colorNameFromFunction);
 
         // owned by somebody else
         vm.prank(VILLAIN);
         colorNameFromFunction = rocolor.getColorName(MURPH_LIGHT_HEX_TRIPLET);
-        colorNameFromStorage = getColorNameFromStorage(MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
         assertEq(colorNameFromStorage, colorNameFromFunction);
     }
 }
@@ -300,14 +308,5 @@ contract RocolorTestConverting is Test, Rocolor {
 // {Arrange, Act, Assert}
 
 // backlog:
-// This is naming... changeColorName(hexTriplet, newColorName), getColorName(hexTriplet)
-// / happy path changing, and emits an event
-// /x reverts if bad name: size
-// // reverts if bad hex: length
-// // reverts if bad hex: numeral
-// reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
-// // reverts if token is not owned
-// // reverts if token is owned by someone else
-// / happy path getting
-// above cases (most) for getting
-// TODO put 3 helper functions into own file, for use with other test suites
+// TODO (maybe?) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
+
