@@ -177,26 +177,55 @@ contract RocolorTestMinting is Test, Rocolor, RocolorTestHelpers {
     }
 
     function testMintColor_Ownership() public {
-        // owned by somebody else
+        // HERO mints one
         vm.prank(HERO);
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+
+        // case: can't mint your own
+        // ...HERO mints the already minted one: REVERT
         vm.expectPartialRevert(ERC721InvalidSender.selector);
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
+
+        // case: can't mint someone else's
+        // ...VILLAIN mints that same already minted one: REVERT
         vm.deal(VILLAIN, 20 ether);
         vm.prank(VILLAIN);
         vm.expectPartialRevert(ERC721InvalidSender.selector);
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
     }
+
+    function testMintColor_Pricing() public {
+        string memory colorNameFromStorage;
+        vm.deal(VILLAIN, 20 ether);
+
+        // case: can't mint black
+        vm.prank(VILLAIN);
+        vm.expectPartialRevert(ROColor__FundsInsufficient.selector);
+        rocolor.mintColor{value: 9.999 ether}("000000", "Black");
+
+        // case: can mint black
+        vm.prank(HERO);
+        rocolor.mintColor{value: 10 ether}("000000", "Black");
+        colorNameFromStorage = getColorNameFromStorage(address(rocolor), 0, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, "Black");
+
+        // case: can't mint blue
+        vm.prank(VILLAIN);
+        vm.expectPartialRevert(ROColor__FundsInsufficient.selector);
+        rocolor.mintColor{value: 0.999 ether}("0000FF", "Blue");
+
+        // case: can mint blue
+        vm.prank(HERO);
+        rocolor.mintColor{value: 1 ether}("0000FF", "Blue");
+        colorNameFromStorage = getColorNameFromStorage(address(rocolor), 255, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, "Blue");
+
+        // case: can't mint murph
+        vm.prank(VILLAIN);
+        vm.expectPartialRevert(ROColor__FundsInsufficient.selector);
+        rocolor.mintColor{value: 0.000999 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+    }
 }
 
 // backlog
-// / Happy Path
-// / Emits a Transfer event
-// / Emits a ROColor__Rename event
-// / Reverts if hex triplet is not exactly 6 bytes
-// / Reverts if a hex triplet byte is not a hexadecimal numeral
-// / Reverts if name length is over 31 bytes
-// / Reverts if minting to the burn address
-// / Reverts if token already exists
-// Reverts if funds are less than the price of the color token
 // TODO (maybe) Reverts if calculated tokenId is 2^24 or greater
