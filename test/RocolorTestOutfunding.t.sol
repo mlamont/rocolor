@@ -35,3 +35,13 @@ contract RocolorTestOutfunding is Test, Rocolor, RocolorTestHelpers {
         vm.deal(HERO, 20 ether);
     }
 }
+// backlog
+// happy path
+// Emits a ROColor__ContractBalanceWithdrawalPassed event
+// happy long path:
+// ... withdraw correct amount after 2 mints
+// ... can mint after withdraw (to see balance goes up after it goes to 0)
+// Reverts if contract is owned by someone else
+// Reverts if contract has no funds to withdraw
+// Reverts if fund withdrawal failed (2 ways)
+
