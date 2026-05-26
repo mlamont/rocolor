@@ -118,7 +118,7 @@ contract RocolorTestMinting is Test, Rocolor, RocolorTestHelpers {
         vm.prank(HERO);
         rocolor.mintColor{value: 1 ether}("C1B7 0", MURPH_LIGHT_COLOR_NAME);
 
-        // case: bad char is ";""
+        // case: bad char is ";"
         vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
         vm.prank(HERO);
         rocolor.mintColor{value: 1 ether}("C1B7;0", MURPH_LIGHT_COLOR_NAME);

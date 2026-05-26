@@ -93,14 +93,56 @@ contract RocolorTestBurning is Test, Rocolor, RocolorTestHelpers {
         vm.prank(HERO);
         rocolor.burnColor("C1B7A02");
     }
+
+    function testBurnColor_HexNumeral() public {
+        // case: bad char is first
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("G1B7A0");
+
+        // case: bad char is middle
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1G7A0");
+
+        // case: bad char is last
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7AG");
+
+        // case: bad char is "*""
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7*0");
+
+        // case: bad char is a space
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7 0");
+
+        // case: bad char is ";"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7;0");
+
+        // case: bad char is "\\"
+        vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1\\7A0");
+    }
+
+    function testBurnColor_Ownership() public {
+        // case: not minted
+        vm.prank(HERO);
+        vm.expectPartialRevert(ERC721NonexistentToken.selector);
+        rocolor.burnColor("000000");
+
+        // case: owned by someone else
+        vm.prank(VILLAIN);
+        vm.expectPartialRevert(ERC721IncorrectOwner.selector);
+        rocolor.burnColor(MURPH_LIGHT_HEX_TRIPLET);
+    }
 }
 
 // backlog:
-// / Happy Path
-// / Emits a Transfer event
-// / Emits a ROColor__Rename event
-// / Reverts if hex triplet is not exactly 6 bytes
-// Reverts if a hex triplet byte is not a hexadecimal numeral
-// Reverts if token is not currently owned/minted
-// Reverts if token is owned by someone else
 // TODO (maybe) Reverts if calculated tokenId is 2^24 or greater
