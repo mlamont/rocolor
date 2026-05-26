@@ -53,8 +53,8 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~aim: readability ... in turn, improved maintainability~~
 - ~~prioritize TODOs in the code~~
 - ~~DOC steps to code this PRJ for a newb~~
-- unit tests: ~~converting, naming, owning, pricing, minting,~~ burning
-- unit tests: receiving, fallingback, tokenURI'g, withdrawing
+- ~~unit tests: converting, naming, owning, pricing, minting, burning~~
+- unit tests: ~~receiving, fallingback,~~ withdrawing, tokenURI'g
 - test order: unit tests, test cov'ge, fuzz, static
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
 - cannot compare strings, so compare (bytes32) hashed encoded ones
