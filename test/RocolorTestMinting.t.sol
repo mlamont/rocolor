@@ -60,6 +60,31 @@ contract RocolorTestMinting is Test, Rocolor, RocolorTestHelpers {
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
     }
 
+    function testMintColor_BalanceGoesUp() public {
+        uint256 minterBalance;
+        uint256 colorPrice;
+
+        minterBalance = address(rocolor).balance;
+
+        colorPrice = 0.001 ether;
+        vm.prank(HERO);
+        rocolor.mintColor{value: colorPrice}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        minterBalance += colorPrice;
+        assertEq(address(rocolor).balance, minterBalance);
+
+        colorPrice = 1 ether;
+        vm.prank(HERO);
+        rocolor.mintColor{value: colorPrice}("0000FF", "Blue");
+        minterBalance += colorPrice;
+        assertEq(address(rocolor).balance, minterBalance);
+
+        colorPrice = 10 ether;
+        vm.prank(HERO);
+        rocolor.mintColor{value: colorPrice}("000000", "Black");
+        minterBalance += colorPrice;
+        assertEq(address(rocolor).balance, minterBalance);
+    }
+
     function testMintColor_HexLength() public {
         // case: length == 0
         vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
