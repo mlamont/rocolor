@@ -47,13 +47,59 @@ contract RocolorTestBurning is Test, Rocolor, RocolorTestHelpers {
             getColorOwnerFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, OWNERS_MAPPING_BASE_SLOT);
         assertEq(colorOwnerFromStorage, address(0));
     }
+
+    function testBurnColor_TransferEvent() public {
+        vm.prank(HERO);
+        vm.expectEmit();
+        emit Transfer(HERO, address(0), MURPH_LIGHT_TOKEN_ID);
+        rocolor.burnColor(MURPH_LIGHT_HEX_TRIPLET);
+    }
+
+    function testBurnColor_RenameEvent() public {
+        vm.prank(HERO);
+        vm.expectEmit();
+        emit ROColor__Rename(MURPH_LIGHT_COLOR_NAME, "", MURPH_LIGHT_TOKEN_ID);
+        rocolor.burnColor(MURPH_LIGHT_HEX_TRIPLET);
+    }
+
+    function testBurnColor_HexLength() public {
+        // case: length == 0
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("");
+
+        // case: length == 1
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C");
+
+        // case: length == 5
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7A");
+
+        // case: length == 6
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7A0");
+        string memory colorNameFromStorage =
+            getColorNameFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, COLOR_NAMES_MAPPING_BASE_SLOT);
+        assertEq(colorNameFromStorage, "");
+        address colorOwnerFromStorage =
+            getColorOwnerFromStorage(address(rocolor), MURPH_LIGHT_TOKEN_ID, OWNERS_MAPPING_BASE_SLOT);
+        assertEq(colorOwnerFromStorage, address(0));
+
+        // case: length == 7
+        vm.expectPartialRevert(ROColor__HexTripletLengthInvalid.selector);
+        vm.prank(HERO);
+        rocolor.burnColor("C1B7A02");
+    }
 }
 
 // backlog:
 // / Happy Path
-// Emits a Transfer event
-// Emits a ROColor__Rename event
-// Reverts if hex triplet is not exactly 6 bytes
+// / Emits a Transfer event
+// / Emits a ROColor__Rename event
+// / Reverts if hex triplet is not exactly 6 bytes
 // Reverts if a hex triplet byte is not a hexadecimal numeral
 // Reverts if token is not currently owned/minted
 // Reverts if token is owned by someone else
