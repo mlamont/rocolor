@@ -34,9 +34,21 @@ contract RocolorTestOutfunding is Test, Rocolor, RocolorTestHelpers {
         rocolor = deployer.run();
         vm.deal(HERO, 20 ether);
     }
+
+    function testWithdraw_HappyPath() public {
+        uint256 senderInitialBalance = address(msg.sender).balance;
+        uint256 sentAmount = 1 ether;
+
+        vm.prank(HERO);
+        rocolor.mintColor{value: sentAmount}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        vm.prank(address(msg.sender));
+        rocolor.withdraw();
+
+        assertEq(address(msg.sender).balance, senderInitialBalance + sentAmount);
+    }
 }
 // backlog
-// happy path
+// / happy path
 // Emits a ROColor__ContractBalanceWithdrawalPassed event
 // happy long path:
 // ... withdraw correct amount after 2 mints
@@ -44,4 +56,5 @@ contract RocolorTestOutfunding is Test, Rocolor, RocolorTestHelpers {
 // Reverts if contract is owned by someone else
 // Reverts if contract has no funds to withdraw
 // Reverts if fund withdrawal failed (2 ways)
+// stops reentrancy
 
