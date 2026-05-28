@@ -89,15 +89,25 @@ contract RocolorTestOutfunding is Test, Rocolor, RocolorTestHelpers {
         rocolor.mintColor{value: sendAmount}("000002", "Almost Darkest Blue");
         assertEq(address(rocolor).balance, sendAmount);
     }
+
+    function testWithdraw_Ownership() public {
+        uint256 sendAmount = 1 ether;
+
+        vm.prank(HERO);
+        rocolor.mintColor{value: sendAmount}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+
+        vm.prank(VILLAIN);
+        vm.expectPartialRevert(OwnableUnauthorizedAccount.selector);
+        rocolor.withdraw();
+    }
+
+    function testWithdraw_Empty() public {
+        vm.prank(address(msg.sender));
+        vm.expectPartialRevert(ROColor__ContractBalanceEmpty.selector);
+        rocolor.withdraw();
+    }
 }
 // backlog
-// / happy path
-// / Emits a ROColor__ContractBalanceWithdrawalPassed event
-// / happy long path:
-// / ... withdraw correct amount after 2 mints
-// / ... can mint after withdraw (to see balance goes up after it goes to 0)
-// Reverts if contract is owned by someone else
-// Reverts if contract has no funds to withdraw
-// Reverts if fund withdrawal failed (2 ways)
-// stops reentrancy
+// TODO Reverts if fund withdrawal failed (2 ways)
+// TODO stops reentrancy
 
