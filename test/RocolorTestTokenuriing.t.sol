@@ -34,4 +34,14 @@ contract RocolorTestTokenuriing is Test, Rocolor, RocolorTestHelpers {
         rocolor = deployer.run();
         vm.deal(HERO, 20 ether);
     }
+
+    function testTokenuri_Revert() public {
+        vm.prank(HERO);
+        vm.expectPartialRevert(ROColor__TokenIdTooBig.selector);
+        rocolor.tokenURI(WHITE_TOKEN_ID + 1);
+    }
 }
+
+// backlog:
+// / reverts if input is 2^24+
+// happy path
