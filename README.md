@@ -55,7 +55,7 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~DOC steps to code this PRJ for a newb~~
 - ~~unit tests: converting, naming, owning, pricing, minting, burning~~
 - ~~unit tests: receiving, fallingback, withdrawing, tokenURI'g~~
-- factor out the constants from the individual tests, and into the helper contract
+- ~~factor out the constants from the individual tests, and into the helper contract~~
 - test order: unit tests, test cov'ge, fuzz, static
 - do harder test cases marked "TODO" in test files
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
