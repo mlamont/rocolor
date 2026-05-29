@@ -59,19 +59,23 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency~~
 - ~~fuzz: name length is always under 32: testFuzz_NameLengthCannotBeOver31~~
 - ~~fuzz: can get URI only for tokenId under 2 to the 24: testFuzz_CannotGetUriForTokenOfAtLeast2ToThe24~~
-- test order: ~~unit tests, test cov'ge,~~ (skip for now: fuzz,) static
+- ~~do static analysis eg Slither / Mythril~~
+- ~~test order: unit tests, test cov'ge, fuzz, static~~
+- ~~cannot compare strings, so compare (bytes32) hashed encoded ones~~
+- ~~test functions += modifiers (to modularize)~~
+- ~~testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug~~
+- collect TODOs from files into this backlog
+- optimize for gas
+- do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
 - fuzz: converting to tokenId always returns under 2 to the 24
-- fuzz: converting to tokenId always reverts for invalid ASCII- do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
-- testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
-- cannot compare strings, so compare (bytes32) hashed encoded ones
-- test functions += modifiers (to modularize)
-- do static analysis eg Slither / Mythril
+- fuzz: converting to tokenId always reverts for invalid ASCII
 - note: DoD: high quality
+- front end on blog's server, later on an IPFS node hosted on that server, if possible
+- [...above/below line...]
 - set & use Helper.Config.s.sol for NetworkConfig for deploy script
 - maybe use a MAKE file
 - get auto-gen'g DOCs site
 - set habit of reading rekt & audit reports
-- front end on blog's server, later on an IPFS node hosted on that server, if possible
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract
 - fuzz: withdraw has balance always go to 0
 - fuzz: receive has balance always go up
