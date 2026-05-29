@@ -59,10 +59,9 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency~~
 - ~~fuzz: name length is always under 32: testFuzz_NameLengthCannotBeOver31~~
 - ~~fuzz: can get URI only for tokenId under 2 to the 24: testFuzz_CannotGetUriForTokenOfAtLeast2ToThe24~~
+- test order: ~~unit tests, test cov'ge,~~ (skip for now: fuzz,) static
 - fuzz: converting to tokenId always returns under 2 to the 24
-- fuzz: converting to tokenId always reverts for invalid ASCII
-- test order: ~~unit tests, test cov'ge,~~ fuzz, static
-- do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
+- fuzz: converting to tokenId always reverts for invalid ASCII- do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
 - cannot compare strings, so compare (bytes32) hashed encoded ones
 - test functions += modifiers (to modularize)

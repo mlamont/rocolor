@@ -39,6 +39,7 @@ contract RocolorFuzzing is StdInvariant, Test, Rocolor, RocolorTestHelpers {
     // function testFuzz_ConvertingToTokenIdAlwaysReturnsUnder2ToThe24(string memory hexTriplet) public {
     //     vm.assume(bytes(hexTriplet).length == HEX_TRIPLET_VALID_LENGTH); // cannot use bound() for this line
     //     // uint8 val;
+    //     ...holy cow, I'm not finding an elegant way to do this that doesn't result in lots of rejections by vm.assume()...
     //     bytes memory hexTripletBytes = bytes(hexTriplet);
     //     for (uint256 i; i < HEX_TRIPLET_VALID_LENGTH; ++i) {
     //         // val = uint8(hexTripletBytes[i]);
