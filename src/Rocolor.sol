@@ -27,6 +27,8 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     bytes16 private constant HEX_SYMBOLS = "0123456789ABCDEF";
     uint256 private constant NUMBER_OF_BITS_IN_A_HEXADECIMAL = 4;
     uint256 private constant COLOR_PRICE_MIN = 0.001 ether;
+    uint256 private constant COLOR_PRICE_MID_MULTIPLIER = 1000;
+    uint256 private constant COLOR_PRICE_MAX_MULTIPLIER = 10000;
     string private constant _SVG_PART_1 =
         '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="50%" y="16" text-anchor="middle" rotate="180" style="fill: black; font-size: 35px;">&#9814;</text><text x="50%" y="320" text-anchor="middle" class="base">';
     string private constant _SVG_PART_2 = '</text><text x="50%" y="337" text-anchor="middle" class="base">#';
@@ -417,13 +419,13 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
         uint256 colorPriceMultiplier = 1;
         if (tokenId == 0 || tokenId == TOKEN_ID_MAX) {
             // 10 ETH for black, white
-            colorPriceMultiplier = 10000;
+            colorPriceMultiplier = COLOR_PRICE_MAX_MULTIPLIER;
         } else if (
             tokenId == 0x0000FF || tokenId == 0x00FF00 || tokenId == 0xFF0000 || tokenId == 0x00FFFF
                 || tokenId == 0xFF00FF || tokenId == 0xFFFF00
         ) {
             // 1 ETH for blue, green, red, cyan, magenta, yellow
-            colorPriceMultiplier = 1000;
+            colorPriceMultiplier = COLOR_PRICE_MID_MULTIPLIER;
         }
         colorPrice = COLOR_PRICE_MIN * colorPriceMultiplier;
     }

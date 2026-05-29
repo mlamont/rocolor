@@ -56,13 +56,12 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~unit tests: converting, naming, owning, pricing, minting, burning~~
 - ~~unit tests: receiving, fallingback, withdrawing, tokenURI'g~~
 - ~~factor out the constants from the individual tests, and into the helper contract~~
-- figure out the invariants, then fuzz test 'em
+- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - test order: ~~unit tests, test cov'ge,~~ fuzz, static
 - do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
 - cannot compare strings, so compare (bytes32) hashed encoded ones
 - test functions += modifiers (to modularize)
-- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
 - do static analysis eg Slither / Mythril
 - note: DoD: high quality
 - set & use Helper.Config.s.sol for NetworkConfig for deploy script
