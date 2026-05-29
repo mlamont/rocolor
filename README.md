@@ -56,7 +56,11 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~unit tests: converting, naming, owning, pricing, minting, burning~~
 - ~~unit tests: receiving, fallingback, withdrawing, tokenURI'g~~
 - ~~factor out the constants from the individual tests, and into the helper contract~~
-- FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency
+- ~~FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency~~
+- fuzz: name length is always under 32
+- fuzz: can get URI only for tokenId under 2 to the 24
+- fuzz: converting to tokenId always returns under 2 to the 24
+- fuzz: converting to tokenId always reverts for invalid ASCII
 - test order: ~~unit tests, test cov'ge,~~ fuzz, static
 - do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
 - testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug
@@ -70,6 +74,14 @@ Rebuild two repositories into this one, tracked via the following...
 - set habit of reading rekt & audit reports
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract
+- fuzz: withdraw has balance always go to 0
+- fuzz: receive has balance always go up
+- fuzz: fallback has balance never go down
+- fuzz: withdraw only allowed by contract owner
+- fuzz: name change only allowed by token owner
+- fuzz: owner change only allowed by token owner
+- fuzz: burn only allowed by token owner
+- fuzz: if named then it is always owned
 
 ## Donations
 
