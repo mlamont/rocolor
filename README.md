@@ -64,11 +64,11 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~cannot compare strings, so compare (bytes32) hashed encoded ones~~
 - ~~test functions += modifiers (to modularize)~~
 - ~~testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug~~
+- ~~fuzz: converting to tokenId always returns under 2 to the 24~~
+- ~~fuzz: converting to tokenId always reverts for invalid ASCII~~
 - collect TODOs from files into this backlog
 - optimize for gas
 - do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
-- fuzz: converting to tokenId always returns under 2 to the 24
-- fuzz: converting to tokenId always reverts for invalid ASCII
 - note: DoD: high quality
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - [...above/below line...]
