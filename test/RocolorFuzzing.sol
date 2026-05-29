@@ -11,6 +11,7 @@ import {StdInvariant} from "lib/forge-std/src/StdInvariant.sol";
 contract RocolorFuzzing is StdInvariant, Test, Rocolor, RocolorTestHelpers {
     uint256 private constant COLOR_NAME_MAX_LENGTH = 31;
     uint256 private constant TOKEN_ID_MAX = 16777215;
+    uint256 private constant HEX_TRIPLET_VALID_LENGTH = 6;
 
     function setUp() public {
         deployer = new DeployRocolor();
@@ -21,17 +22,33 @@ contract RocolorFuzzing is StdInvariant, Test, Rocolor, RocolorTestHelpers {
     }
 
     function testFuzz_NameLengthCannotBeOver31(string memory colorName) public {
-        vm.assume(bytes(colorName).length > COLOR_NAME_MAX_LENGTH);
+        vm.assume(bytes(colorName).length > COLOR_NAME_MAX_LENGTH); // cannot use bound() for this line
         vm.prank(HERO);
         vm.expectPartialRevert(ROColor__ColorNameTooBig.selector);
         rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, colorName);
     }
 
     function testFuzz_CannotGetUriForTokenOfAtLeast2ToThe24(uint256 tokenId) public {
-        vm.assume(tokenId > TOKEN_ID_MAX);
+        tokenId = bound(tokenId, TOKEN_ID_MAX + 1, UINT256_MAX); // better than vm.assume() for this line
         string memory tokenUri;
         vm.prank(HERO);
         vm.expectPartialRevert(ROColor__TokenIdTooBig.selector);
         tokenUri = rocolor.tokenURI(tokenId);
     }
+
+    // function testFuzz_ConvertingToTokenIdAlwaysReturnsUnder2ToThe24(string memory hexTriplet) public {
+    //     vm.assume(bytes(hexTriplet).length == HEX_TRIPLET_VALID_LENGTH); // cannot use bound() for this line
+    //     // uint8 val;
+    //     bytes memory hexTripletBytes = bytes(hexTriplet);
+    //     for (uint256 i; i < HEX_TRIPLET_VALID_LENGTH; ++i) {
+    //         // val = uint8(hexTripletBytes[i]);
+    //         // vm.assume((val >= 0x30 && val <= 0x39) || (val >= 0x61 && val <= 0x66) || (val >= 0x41 && val <= 0x46));
+    //         if (uint8(hexTripletBytes[i]) < 0x30) {
+    //             hexTripletBytes[i] = bound(hexTripletBytes[i], 0x00, 0x09);
+    //         }
+    //     }
+    //     vm.prank(HERO);
+    //     uint256 tokenId = rocolor.convertHexTripletToDecimal(hexTriplet);
+    //     assert(tokenId < TOKEN_ID_MAX);
+    // }
 }
