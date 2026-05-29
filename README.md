@@ -57,8 +57,8 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~unit tests: receiving, fallingback, withdrawing, tokenURI'g~~
 - ~~factor out the constants from the individual tests, and into the helper contract~~
 - ~~FO the invariants, then Fuzz Test 'em, e.g., conservation, solvency, monotonicity, bounds, access ctrl, state consistency~~
-- fuzz: name length is always under 32
-- fuzz: can get URI only for tokenId under 2 to the 24
+- ~~fuzz: name length is always under 32: testFuzz_NameLengthCannotBeOver31~~
+- ~~fuzz: can get URI only for tokenId under 2 to the 24: testFuzz_CannotGetUriForTokenOfAtLeast2ToThe24~~
 - fuzz: converting to tokenId always returns under 2 to the 24
 - fuzz: converting to tokenId always reverts for invalid ASCII
 - test order: ~~unit tests, test cov'ge,~~ fuzz, static
