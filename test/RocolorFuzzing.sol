@@ -55,21 +55,4 @@ contract RocolorFuzzing is StdInvariant, Test, Rocolor, RocolorTestHelpers {
         vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
         tokenId = rocolor.convertHexTripletToDecimal(string(hexTripletBytes));
     }
-
-    // function testFuzz_ConvertingToTokenIdAlwaysReturnsUnder2ToThe24(string memory hexTriplet) public {
-    //     vm.assume(bytes(hexTriplet).length == HEX_TRIPLET_VALID_LENGTH); // cannot use bound() for this line
-    //     // uint8 val;
-    //     ...holy cow, I'm not finding an elegant way to do this that doesn't result in lots of rejections by vm.assume()...
-    //     bytes memory hexTripletBytes = bytes(hexTriplet);
-    //     for (uint256 i; i < HEX_TRIPLET_VALID_LENGTH; ++i) {
-    //         // val = uint8(hexTripletBytes[i]);
-    //         // vm.assume((val >= 0x30 && val <= 0x39) || (val >= 0x61 && val <= 0x66) || (val >= 0x41 && val <= 0x46));
-    //         if (uint8(hexTripletBytes[i]) < 0x30) {
-    //             hexTripletBytes[i] = bound(hexTripletBytes[i], 0x00, 0x09);
-    //         }
-    //     }
-    //     vm.prank(HERO);
-    //     uint256 tokenId = rocolor.convertHexTripletToDecimal(hexTriplet);
-    //     assert(tokenId < TOKEN_ID_MAX);
-    // }
 }

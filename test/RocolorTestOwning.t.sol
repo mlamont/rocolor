@@ -8,22 +8,6 @@ import {DeployRocolor} from "script/DeployRocolor.s.sol";
 import {RocolorTestHelpers} from "./RocolorTestHelpers.sol";
 
 contract RocolorTestOwning is Test, Rocolor, RocolorTestHelpers {
-    // Rocolor rocolor;
-    // DeployRocolor deployer;
-    // string hexTriplet;
-    // uint256 tokenId;
-    // address HERO = makeAddr("hero");
-    // address VILLAIN = makeAddr("villain");
-    // address FRIEND = makeAddr("friend");
-    // uint256 constant MURPH_LIGHT_TOKEN_ID = 12695456;
-    // string constant MURPH_LIGHT_HEX_TRIPLET = "C1B7A0";
-    // string constant MURPH_LIGHT_COLOR_NAME = "MurphLight";
-    // string constant SUPER_BORING_COLOR_NAME = "Super Boring";
-    // uint256 constant WHITE_TOKEN_ID = 16777215;
-    // uint256 constant BLACK_TOKEN_ID = 0;
-    // uint256 constant OWNERS_MAPPING_BASE_SLOT = 2;
-    // uint256 constant COLOR_NAMES_MAPPING_BASE_SLOT = 7;
-
     function setUp() public {
         deployer = new DeployRocolor();
         rocolor = deployer.run();
@@ -218,8 +202,6 @@ contract RocolorTestOwning is Test, Rocolor, RocolorTestHelpers {
         vm.expectPartialRevert(ERC721NonexistentToken.selector);
         vm.prank(HERO);
         colorOwnerFromFunction = rocolor.getColorOwner("000000");
-        // colorOwnerFromStorage = getColorOwnerFromStorage(address(rocolor), 0, OWNERS_MAPPING_BASE_SLOT);
-        // assertEq(colorOwnerFromStorage, colorOwnerFromFunction);
 
         // owned by somebody else
         vm.prank(VILLAIN);
@@ -229,11 +211,3 @@ contract RocolorTestOwning is Test, Rocolor, RocolorTestHelpers {
         assertEq(colorOwnerFromStorage, colorOwnerFromFunction);
     }
 }
-
-// notes:
-// console.log("FFFFFF is:", decimal);
-// {Arrange, Act, Assert}
-
-// backlog:
-// TODO (maybe) new owner: invalid (too long, too short) ... seems handled by compiler
-// TODO (maybe) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?

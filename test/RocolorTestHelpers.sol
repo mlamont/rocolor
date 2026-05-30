@@ -74,10 +74,6 @@ contract RocolorTestHelpers is Test {
         for (uint256 i = 0; i < 20; i++) {
             ownerAddressBytes[i] = storageStringBytes[12 + i];
         }
-        // ownerAddress = string(nameStringBytes);
-
-        // how are addresses stored in a storage slot?
-        // ownerAddress = address(uint160(abi.encode(storageString)));
         ownerAddress = vm.parseAddress(vm.toString(ownerAddressBytes));
     }
 

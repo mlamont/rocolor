@@ -18,7 +18,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     ***** STATE VARIABLES
     ****/
 
-    // DONE include "tokenId"?
     mapping(uint256 tokenId => string colorName) internal _colorNames;
 
     uint256 private constant TOKEN_ID_MAX = 16777215;
@@ -59,7 +58,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     ***** CONSTRUCTOR
     ****/
 
-    // DONE nothing in here?
     constructor() ERC721("ROColor", "ROC") Ownable(_msgSender()) {}
 
     /****
@@ -90,7 +88,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     ***** EXTERNAL FUNCTIONS
     ****/
 
-    // DONE deep review of each line, and put a REENTRANCY guard here
     /**
      * @notice Withdraws all funds from the contract, only by the contract owner
      * @dev Reverts if contract is owned by someone else
@@ -240,10 +237,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     ***** PUBLIC FUNCTIONS
     ****/
 
-    // NOTE: this is the function to optimize the most: called all the time!
-    // DONE rename 'a' to 'asciiNumber'? also, the casts seem awkward
-    // DONE: learn & use bit operations i/o arithmatic
-    // DONE: get function title to have lowest selector number, so less run-t gas in finding it
     /**
      * @notice Converts a hexadecimal number into its decimal representation: a human-friendly color identifier to a contract-friendly one
      * @dev Constructs decimal number as the sum of the appropriately bit-shifted bit-values of each hexadecimal numeral
@@ -323,9 +316,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
     ***** INTERNAL FUNCTIONS
     ****/
 
-    // DONE make this payable?
-    // DONE: learn & use: bit operations & bitmaps to reduce comparisons, and punt price check to end
-    // DONE: investigate WARNING: minting is a source of reentrancy: it calls IERC721Receiver(to).onERC721received(): YES! put a reentrancy guard in the external version
     /**
      * @notice Creates a ROColor named color token
      * @dev No input validations beyond ERC721 base contract token-minting validations
@@ -403,11 +393,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
         colorOwner = ownerOf(tokenId);
     }
 
-    // DONE comment to include color names w/ tokenIds
-    // DONE learn & use: bit operations & bitmaps to reduce comparisons
-    // DONE if & elseif instead of 2 separate ifs
-    // DONE investigate if can say token IS IN {255, 65280, ...}
-    // DONE consider unchecked {}
     /**
      * @notice Gets the price of a ROColor token
      * @dev Constructs price as the product of a minimum and a factor representing pricing tiers

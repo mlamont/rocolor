@@ -66,8 +66,9 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~testing suite & types: unit, integrations, coverage, (gas) snapshot, test --debug~~
 - ~~fuzz: converting to tokenId always returns under 2 to the 24~~
 - ~~fuzz: converting to tokenId always reverts for invalid ASCII~~
-- collect TODOs from files into this backlog
-- optimize for gas
+- ~~collect TODOs from files into this backlog~~
+- nothing for the constructor?
+- optimize for gas, esp. convertHexTripletToDecimal()
 - do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
 - note: DoD: high quality
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
@@ -85,6 +86,14 @@ Rebuild two repositories into this one, tracked via the following...
 - fuzz: owner change only allowed by token owner
 - fuzz: burn only allowed by token owner
 - fuzz: if named then it is always owned
+- test burning += (maybe) Reverts if calculated tokenId is 2^24 or greater
+- test minting += (maybe) Reverts if calculated tokenId is 2^24 or greater
+- test naming += (maybe?) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
+- test outfunding += Reverts if fund withdrawal failed (2 ways)
+- test outfunding += stops reentrancy
+- test owning += (maybe) new owner: invalid (too long, too short) ... seems handled by compiler
+- test owning += (maybe) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
+- test pricing += reverts: calc'd tokenId is (2^24)+ ... doable at all?
 
 ## Donations
 

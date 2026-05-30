@@ -8,21 +8,6 @@ import {DeployRocolor} from "script/DeployRocolor.s.sol";
 import {RocolorTestHelpers} from "./RocolorTestHelpers.sol";
 
 contract RocolorTestNaming is Test, Rocolor, RocolorTestHelpers {
-    // Rocolor rocolor;
-    // DeployRocolor deployer;
-    // string hexTriplet;
-    // uint256 tokenId;
-    // address HERO = makeAddr("hero");
-    // address VILLAIN = makeAddr("villain");
-    // uint256 constant MURPH_LIGHT_TOKEN_ID = 12695456;
-    // string constant MURPH_LIGHT_HEX_TRIPLET = "C1B7A0";
-    // string constant MURPH_LIGHT_COLOR_NAME = "MurphLight";
-    // string constant SUPER_BORING_COLOR_NAME = "Super Boring";
-    // uint256 constant WHITE_TOKEN_ID = 16777215;
-    // uint256 constant BLACK_TOKEN_ID = 0;
-    // uint256 constant OWNERS_MAPPING_BASE_SLOT = 2;
-    // uint256 constant COLOR_NAMES_MAPPING_BASE_SLOT = 7;
-
     function setUp() public {
         deployer = new DeployRocolor();
         rocolor = deployer.run();
@@ -30,44 +15,6 @@ contract RocolorTestNaming is Test, Rocolor, RocolorTestHelpers {
         vm.prank(HERO);
         rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
     }
-
-    // function getMappingValueStorageSlot(uint256 mappingKey, uint256 mappingVariableStorageSlot)
-    //     public
-    //     pure
-    //     returns (bytes32 mappingValueStorageSlot)
-    // {
-    //     mappingValueStorageSlot = keccak256(abi.encode(mappingKey, mappingVariableStorageSlot));
-    // }
-
-    // function convertStorageStringToColorNameString(bytes32 storageString)
-    //     public
-    //     pure
-    //     returns (string memory nameString)
-    // {
-    //     bytes memory storageStringBytes = abi.encode(storageString);
-    //     uint256 sizeByte = uint8(storageStringBytes[31]);
-    //     require(sizeByte % 2 == 0, "storage string too long");
-    //     bytes memory nameStringBytes = new bytes(sizeByte / 2);
-    //     for (uint256 i = 0; i < (sizeByte / 2); i++) {
-    //         nameStringBytes[i] = storageStringBytes[i];
-    //     }
-    //     nameString = string(nameStringBytes);
-    // }
-
-    // function getColorNameFromStorage(uint256 _tokenId, uint256 mappingVariableStorageSlot)
-    //     public
-    //     view
-    //     returns (string memory colorName)
-    // {
-    //     // get the storage slot of the colorName
-    //     bytes32 mappingValueStorageSlot = getMappingValueStorageSlot(_tokenId, mappingVariableStorageSlot);
-
-    //     // get the value in that storage slot
-    //     bytes32 storageValue = vm.load(address(rocolor), mappingValueStorageSlot);
-
-    //     // get the colorName from that storage slot's value
-    //     colorName = convertStorageStringToColorNameString(storageValue);
-    // }
 
     function testChangeColorName_HappyPath() public {
         //// Arrange
@@ -304,10 +251,3 @@ contract RocolorTestNaming is Test, Rocolor, RocolorTestHelpers {
         assertEq(colorNameFromStorage, colorNameFromFunction);
     }
 }
-
-// notes:
-// console.log("FFFFFF is:", decimal);
-// {Arrange, Act, Assert}
-
-// backlog:
-// TODO (maybe?) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?

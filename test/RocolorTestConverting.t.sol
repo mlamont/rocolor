@@ -8,15 +8,6 @@ import {DeployRocolor} from "script/DeployRocolor.s.sol";
 import {RocolorTestHelpers} from "./RocolorTestHelpers.sol";
 
 contract RocolorTestConverting is Test, Rocolor, RocolorTestHelpers {
-    // Rocolor rocolor;
-    // DeployRocolor deployer;
-    // string colorhex;
-    // uint256 decimal;
-    // uint256 constant MURPH_LIGHT_DECIMAL = 12695456;
-    // string constant MURPH_LIGHT_COLORHEX = "C1B7A0";
-    // uint256 constant WHITE_DECIMAL = 16777215;
-    // uint256 constant BLACK_DECIMAL = 0;
-
     function setUp() public {
         deployer = new DeployRocolor();
         rocolor = deployer.run();
@@ -139,10 +130,3 @@ contract RocolorTestConverting is Test, Rocolor, RocolorTestHelpers {
         console.log("accepted largest");
     }
 }
-
-// notes:
-// console.log("FFFFFF is:", decimal);
-// {Arrange, Act, Assert}
-
-// backlog:
-// TODO fuzz testing for convertColorhexToDecimal()
