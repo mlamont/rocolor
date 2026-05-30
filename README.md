@@ -69,7 +69,11 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~collect TODOs from files into this backlog~~
 - ~~nothing for the constructor?~~
 - ~~optimize for gas, esp. convertHexTripletToDecimal() ...am good for now~~
-- do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
+- ~~fuzz: withdraw only allowed by contract owner~~
+- ~~fuzz: name change only allowed by token owner~~
+- ~~fuzz: owner change only allowed by token owner~~
+- ~~fuzz: burn only allowed by token owner~~
+- test outfunding += stops reentrancy
 - note: DoD: high quality
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - [...above/below line...]
@@ -78,19 +82,14 @@ Rebuild two repositories into this one, tracked via the following...
 - get auto-gen'g DOCs site
 - set habit of reading rekt & audit reports
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract
+- fuzz: if named then it is always owned
 - fuzz: withdraw has balance always go to 0
 - fuzz: receive has balance always go up
 - fuzz: fallback has balance never go down
-- fuzz: withdraw only allowed by contract owner
-- fuzz: name change only allowed by token owner
-- fuzz: owner change only allowed by token owner
-- fuzz: burn only allowed by token owner
-- fuzz: if named then it is always owned
 - test burning += (maybe) Reverts if calculated tokenId is 2^24 or greater
 - test minting += (maybe) Reverts if calculated tokenId is 2^24 or greater
 - test naming += (maybe?) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
 - test outfunding += Reverts if fund withdrawal failed (2 ways)
-- test outfunding += stops reentrancy
 - test owning += (maybe) new owner: invalid (too long, too short) ... seems handled by compiler
 - test owning += (maybe) reverts if bad calc'd tokenId: size ... fuzz this and assert tokenId size limit?
 - test pricing += reverts: calc'd tokenId is (2^24)+ ... doable at all?

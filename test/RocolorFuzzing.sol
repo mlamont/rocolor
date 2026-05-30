@@ -55,4 +55,46 @@ contract RocolorFuzzing is StdInvariant, Test, Rocolor, RocolorTestHelpers {
         vm.expectPartialRevert(ROColor__HexTripletNumeralInvalid.selector);
         tokenId = rocolor.convertHexTripletToDecimal(string(hexTripletBytes));
     }
+
+    function testFuzz_OnlyContractOwnerCanWithdraw(address seed) public {
+        vm.deal(HERO, 10 ether);
+        vm.prank(HERO);
+        rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        vm.assume(seed != msg.sender);
+        vm.prank(seed);
+        vm.expectPartialRevert(OwnableUnauthorizedAccount.selector);
+        rocolor.withdraw();
+    }
+
+    function testFuzz_OnlyColorOwnerCanRename(address seed) public {
+        vm.deal(HERO, 10 ether);
+        vm.prank(HERO);
+        rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        vm.assume(seed != HERO);
+        vm.prank(seed);
+        vm.expectPartialRevert(ERC721IncorrectOwner.selector);
+        rocolor.changeColorName(MURPH_LIGHT_HEX_TRIPLET, SUPER_BORING_COLOR_NAME);
+    }
+
+    function testFuzz_OnlyColorOwnerCanReown(address seed) public {
+        vm.deal(HERO, 10 ether);
+        vm.prank(HERO);
+        rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        vm.assume(seed != HERO);
+        vm.assume(seed != address(0));
+        vm.prank(seed);
+        vm.expectPartialRevert(ERC721IncorrectOwner.selector);
+        rocolor.changeColorOwner(MURPH_LIGHT_HEX_TRIPLET, seed);
+    }
+
+    function testFuzz_OnlyColorOwnerCanBurn(address seed) public {
+        vm.deal(HERO, 10 ether);
+        vm.prank(HERO);
+        rocolor.mintColor{value: 1 ether}(MURPH_LIGHT_HEX_TRIPLET, MURPH_LIGHT_COLOR_NAME);
+        vm.assume(seed != HERO);
+        vm.assume(seed != address(0));
+        vm.prank(seed);
+        vm.expectPartialRevert(ERC721IncorrectOwner.selector);
+        rocolor.burnColor(MURPH_LIGHT_HEX_TRIPLET);
+    }
 }
