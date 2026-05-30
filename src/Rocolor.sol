@@ -102,7 +102,6 @@ contract Rocolor is ERC721, Ownable, ReentrancyGuard {
         (bool success,) = payable(owner()).call{value: balanceOfThisContract}("");
         if (!success) revert ROColor__ContractBalanceWithdrawalFailed();
         emit ROColor__ContractBalanceWithdrawalPassed(balanceOfThisContract);
-        if (address(this).balance != 0) revert ROColor__ContractBalanceWithdrawalFailed();
     }
 
     /**
