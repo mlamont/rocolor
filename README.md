@@ -67,7 +67,7 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~fuzz: converting to tokenId always returns under 2 to the 24~~
 - ~~fuzz: converting to tokenId always reverts for invalid ASCII~~
 - ~~collect TODOs from files into this backlog~~
-- nothing for the constructor?
+- ~~nothing for the constructor?~~
 - optimize for gas, esp. convertHexTripletToDecimal()
 - do harder test cases marked "TODO" in test files: should complete coverage for the remaining 9 statements/branches
 - note: DoD: high quality
