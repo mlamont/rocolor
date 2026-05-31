@@ -73,8 +73,7 @@ Rebuild two repositories into this one, tracked via the following...
 - ~~fuzz: name change only allowed by token owner~~
 - ~~fuzz: owner change only allowed by token owner~~
 - ~~fuzz: burn only allowed by token owner~~
-- test outfunding += stops reentrancy
-- note: DoD: high quality
+- ~~note: DoD: high quality~~
 - front end on blog's server, later on an IPFS node hosted on that server, if possible
 - [...above/below line...]
 - set & use Helper.Config.s.sol for NetworkConfig for deploy script
@@ -82,6 +81,7 @@ Rebuild two repositories into this one, tracked via the following...
 - get auto-gen'g DOCs site
 - set habit of reading rekt & audit reports
 - explore this being a proxy contract, or utilizing a library / interface / abstract contract
+- test outfunding += stops reentrancy
 - fuzz: if named then it is always owned
 - fuzz: withdraw has balance always go to 0
 - fuzz: receive has balance always go up
